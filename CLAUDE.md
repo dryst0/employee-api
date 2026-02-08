@@ -83,7 +83,8 @@ Dependency rules (enforced via ArchUnit):
 - **SOLID Principles**: Follow Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion across all code.
 - **Object Calisthenics**: Apply these constraints — small methods, minimal indentation levels, first-class collections, no getters/setters exposing internals unnecessarily, wrap primitives that carry domain meaning, keep classes small and focused.
 - **Rule of Three**: Only extract duplicate code into a shared abstraction when it appears more than two times. Two occurrences are acceptable — premature extraction adds unnecessary indirection.
-- **Fail-fast**: If the application detects an unrecoverable state (invalid configuration, missing critical dependency, corrupted data), terminate immediately rather than continue in a broken state. Trust but verify — and if verification fails, kill the app.
+- **Defensive programming**: Validate inputs and assumptions at system boundaries (user input, external APIs, configuration). Trust internal code and framework guarantees once validated.
+- **Fail-fast**: If a defensive check detects an unrecoverable state (invalid configuration, missing critical dependency, corrupted data), terminate immediately rather than continue in a broken state.
 - **Transformation Priority Premise**: When refactoring, prefer simpler transformations over complex ones (e.g., constant → scalar → direct replacement → conditional → iteration → recursion). Apply transformations incrementally in order of priority to arrive at cleaner solutions.
 
 ### Testing Patterns
