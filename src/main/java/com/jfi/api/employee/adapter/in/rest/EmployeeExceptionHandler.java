@@ -12,7 +12,9 @@ public class EmployeeExceptionHandler {
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ProblemDetail handleEmployeeNotFound(EmployeeNotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND, ex.getMessage());
+            HttpStatus.NOT_FOUND,
+            ex.getMessage()
+        );
         problem.setTitle("Employee Not Found");
         problem.setType(URI.create("about:blank"));
         return problem;
