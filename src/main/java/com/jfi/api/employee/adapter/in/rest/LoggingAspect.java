@@ -18,7 +18,7 @@ import reactor.util.context.ContextView;
 public class LoggingAspect {
 
     @Pointcut(
-        "(within(com.jfi.api.employee.adapter.in.rest..*) || within(com.jfi.api.employee.usecase..*) || within(com.jfi.api.employee.adapter.out.persistence..*)) && !within(com.jfi.api.employee.adapter.in.rest.LoggingAspect) && !within(com.jfi.api.employee.adapter.in.rest.EmployeeExceptionHandler) && !within(com.jfi.api.employee.adapter.in.rest.RequestIdFilter)"
+        "(within(com.jfi.api.employee.adapter.in.rest..*) || within(com.jfi.api.employee.usecase..*) || within(com.jfi.api.employee.adapter.out.persistence..*)) && !within(com.jfi.api.employee.adapter.in.rest.LoggingAspect) && !within(com.jfi.api.employee.adapter.in.rest.EmployeeExceptionHandler) && !within(com.jfi.api.employee.adapter.in.rest.RequestIdFilter) && !within(com.jfi.api.employee.adapter.in.rest.RequestLoggingFilter)"
     )
     public void applicationMethods() {}
 
