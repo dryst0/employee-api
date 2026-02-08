@@ -82,6 +82,7 @@ Dependency rules (enforced via ArchUnit):
 - **Pragmatism**: Prefer officially supported, well-documented solutions over marginal gains. When choosing between tools, libraries, or approaches, weigh the trade-off between benefit and maintenance/compatibility cost. A small improvement isn't worth it if it takes you off the supported path.
 - **SOLID Principles**: Follow Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion across all code.
 - **Object Calisthenics**: Apply these constraints — small methods, minimal indentation levels, first-class collections, no getters/setters exposing internals unnecessarily, wrap primitives that carry domain meaning, keep classes small and focused.
+- **Rule of Three**: Only extract duplicate code into a shared abstraction when it appears more than two times. Two occurrences are acceptable — premature extraction adds unnecessary indirection.
 - **Transformation Priority Premise**: When refactoring, prefer simpler transformations over complex ones (e.g., constant → scalar → direct replacement → conditional → iteration → recursion). Apply transformations incrementally in order of priority to arrive at cleaner solutions.
 
 ### Testing Patterns
