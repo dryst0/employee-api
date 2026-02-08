@@ -38,6 +38,8 @@ This is a **Spring Boot 3.5** reactive microservice using **Java 25**.
 
 The entire stack is non-blocking: **Spring WebFlux** (Netty server) + **R2DBC** (reactive database) + **Project Reactor** (`Mono<T>` / `Flux<T>` return types). All service and repository methods must return reactive types.
 
+**When to use WebFlux vs Spring MVC + Virtual Threads**: WebFlux is justified only for streaming use cases — SSE/live feeds, WebSockets, change streams, tailable cursors, backpressure-sensitive pipelines, and high-concurrency gateways (500k+ connections). For standard request/response CRUD APIs, Spring MVC with virtual threads (Java 21+) provides identical scalability with simpler code, readable stack traces, natural MDC propagation, and no reactive ceremony. A reactive database driver (R2DBC, MongoDB Reactive Streams) does not require WebFlux — blocking drivers with virtual threads perform equally well for bounded queries. The web framework and database driver choices are independent decisions.
+
 ### Hexagonal Architecture (Ports & Adapters, Enforced by ArchUnit)
 
 Organized by domain entity, then by hexagonal role. Each entity package is self-contained.
