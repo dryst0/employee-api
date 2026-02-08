@@ -66,12 +66,15 @@ Dependency rules (enforced via ArchUnit):
 - **Error handling**: Uses Spring Boot's native `ProblemDetail` for RFC 7807 Problem JSON responses (no external library needed).
 - **API docs**: SpringDoc OpenAPI auto-generates Swagger UI at `/swagger-ui.html`.
 - **Logging**: Log4j2 with Disruptor for async logging (spring-boot-starter-logging is excluded).
+- **Log levels**: DEBUG for method-level tracing (e.g., AOP aspect). INFO for successful operations, handled client errors (4xx), and expected failures. WARN for errors the application recovers from. ERROR only for unhandled failures (5xx). Use typed checks like `HttpStatusCode.is5xxServerError()` instead of magic numbers.
+- **No magic numbers or strings**: Use framework-provided constants, enums, or typed methods instead of raw numeric literals or string literals (e.g., `status.is5xxServerError()` not `code >= 500`; `RequestIdFilter.REQUEST_ID_KEY` not `"requestId"`).
 - **Monitoring**: Spring Boot Actuator is included for health/metrics endpoints.
 
 ### Git Conventions
 
 - **Conventional Commits**: Use the format `type(scope): description` (e.g., `feat(employee): add GET endpoints`, `fix(dto): correct default employee type`, `refactor(usecase): extract mapping logic`). Common types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `build`.
 - **Commit messages**: Keep short and concise. Always explain **why** the change was made. Include **what** only when not obvious from the diff.
+- **Small green commits**: Always commit small, incremental changes that are green (all tests pass). Never commit large changes in one go. Each commit should be a single logical unit — one feature, one refactor step, or one bug fix.
 - **Semantic Versioning**: Use `MAJOR.MINOR.PATCH` for releases. Use `-SNAPSHOT` suffix during development. Bump MAJOR for breaking changes, MINOR for new features, PATCH for bug fixes. The POM version is used as the container image tag.
 
 ### Design Principles
