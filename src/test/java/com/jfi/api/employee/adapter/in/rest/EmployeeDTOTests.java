@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class EmployeeDTOTests {
 
     @Test
-    void givenValues_thenReturnEmployeeDTO() {
+    void givenValues_whenConstructed_thenReturnEmployeeDTO() {
         UUID uuid = UUID.randomUUID();
         String firstName = "Juan";
         String lastName = "dela Cruz";
@@ -28,7 +28,7 @@ class EmployeeDTOTests {
     }
 
     @Test
-    void givenNoEmployeeType_thenDefaultToWorker() {
+    void givenNoEmployeeType_whenConstructed_thenDefaultToWorker() {
         UUID uuid = UUID.randomUUID();
         EmployeeDTO employeeDTO = new EmployeeDTO(uuid, "Juan", "dela Cruz");
 

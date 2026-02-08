@@ -47,7 +47,7 @@ class EmployeeServiceImplTests {
     }
 
     @Test
-    void givenEmployeeId_thenReturnEmployee() {
+    void givenEmployeeId_whenFindById_thenReturnEmployee() {
         // given
         UUID workerId = workerEntity.getUuid();
 
@@ -64,7 +64,7 @@ class EmployeeServiceImplTests {
     }
 
     @Test
-    void givenNoParameters_thenReturnAllEmployees() {
+    void givenNoParameters_whenFindAll_thenReturnAllEmployees() {
         // when / then
         StepVerifier.create(employeeService.findAllEmployees())
             .expectNextMatches(e -> e.getUuid().equals(workerEntity.getUuid()))
