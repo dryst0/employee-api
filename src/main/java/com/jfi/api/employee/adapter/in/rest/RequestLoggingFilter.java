@@ -1,7 +1,6 @@
 package com.jfi.api.employee.adapter.in.rest;
 
 import java.util.concurrent.atomic.AtomicReference;
-
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatusCode;
@@ -24,28 +23,57 @@ public class RequestLoggingFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         long start = System.currentTimeMillis();
         AtomicReference<Throwable> error = new AtomicReference<>();
-        return chain
+        return Mono.deferContextual(ctx ->
+            chain
                 .filter(exchange)
                 .doOnError(error::set)
                 .doFinally(s -> {
+                    ctx
+                        .getOrEmpty(RequestIdFilter.REQUEST_ID_KEY)
+                        .ifPresent(id ->
+                            MDC.put(
+                                RequestIdFilter.REQUEST_ID_KEY,
+                                id.toString()
+                            )
+                        );
                     long duration = System.currentTimeMillis() - start;
-                    HttpStatusCode status = exchange.getResponse().getStatusCode();
+                    HttpStatusCode status = exchange
+                        .getResponse()
+                        .getStatusCode();
                     Throwable cause = error.get();
-                    if (cause != null && status != null && status.is5xxServerError()) {
-                        log.error("{} {} {} in {}ms - {}",
-                                request.getMethod(), request.getPath(),
-                                status.value(), duration, cause.getMessage());
+                    if (
+                        cause != null &&
+                        status != null &&
+                        status.is5xxServerError()
+                    ) {
+                        log.error(
+                            "{} {} {} in {}ms - {}",
+                            request.getMethod(),
+                            request.getPath(),
+                            status.value(),
+                            duration,
+                            cause.getMessage()
+                        );
                     } else if (cause != null) {
-                        log.info("{} {} {} in {}ms - {}",
-                                request.getMethod(), request.getPath(),
-                                status != null ? status.value() : "unknown",
-                                duration, cause.getMessage());
+                        log.info(
+                            "{} {} {} in {}ms - {}",
+                            request.getMethod(),
+                            request.getPath(),
+                            status != null ? status.value() : "unknown",
+                            duration,
+                            cause.getMessage()
+                        );
                     } else {
-                        log.info("{} {} {} in {}ms",
-                                request.getMethod(), request.getPath(),
-                                status != null ? status.value() : "unknown",
-                                duration);
+                        log.info(
+                            "{} {} {} in {}ms",
+                            request.getMethod(),
+                            request.getPath(),
+                            status != null ? status.value() : "unknown",
+                            duration
+                        );
                     }
-                });
+                    MDC.clear();
+                })
+        );
     }
 }
