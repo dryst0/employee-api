@@ -39,7 +39,10 @@ class EmployeeExceptionHandlerTests {
         ProblemDetail problem = handler.handleEmployeeNotFound(exception);
 
         // then
-        assertEquals("Employee Not Found", problem.getTitle());
+        assertEquals(
+            EmployeeExceptionHandler.EMPLOYEE_NOT_FOUND_TITLE,
+            problem.getTitle()
+        );
     }
 
     @Test
@@ -54,7 +57,10 @@ class EmployeeExceptionHandlerTests {
         ProblemDetail problem = handler.handleEmployeeNotFound(exception);
 
         // then
-        assertEquals("Employee not found: " + uuid, problem.getDetail());
+        assertEquals(
+            EmployeeNotFoundException.MESSAGE_PREFIX + uuid,
+            problem.getDetail()
+        );
     }
 
     @Test
@@ -69,6 +75,9 @@ class EmployeeExceptionHandlerTests {
         ProblemDetail problem = handler.handleEmployeeNotFound(exception);
 
         // then
-        assertEquals(URI.create("about:blank"), problem.getType());
+        assertEquals(
+            EmployeeExceptionHandler.PROBLEM_DEFAULT_TYPE,
+            problem.getType()
+        );
     }
 }

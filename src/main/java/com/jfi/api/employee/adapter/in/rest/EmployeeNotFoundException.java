@@ -4,7 +4,9 @@ import java.util.UUID;
 
 public class EmployeeNotFoundException extends RuntimeException {
 
+    static final String MESSAGE_PREFIX = "Employee not found: ";
+
     public EmployeeNotFoundException(UUID uuid) {
-        super("Employee not found: " + uuid);
+        super(MESSAGE_PREFIX + uuid);
     }
 }
