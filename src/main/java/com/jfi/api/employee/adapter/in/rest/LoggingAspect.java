@@ -18,8 +18,16 @@ import reactor.util.context.ContextView;
 public class LoggingAspect {
 
     @Pointcut(
-        "(within(com.jfi.api.employee.adapter.in.rest..*) || within(com.jfi.api.employee.usecase..*) || within(com.jfi.api.employee.adapter.out.persistence..*)) && !within(com.jfi.api.employee.adapter.in.rest.LoggingAspect) && !within(com.jfi.api.employee.adapter.in.rest.EmployeeExceptionHandler) && !within(com.jfi.api.employee.adapter.in.rest.RequestIdFilter) && !within(com.jfi.api.employee.adapter.in.rest.RequestLoggingFilter)"
+        "within(com.jfi.api.employee.adapter.in.rest..*) || within(com.jfi.api.employee.usecase..*) || within(com.jfi.api.employee.adapter.out.persistence..*)"
     )
+    public void applicationLayer() {}
+
+    @Pointcut(
+        "within(com.jfi.api.employee.adapter.in.rest.LoggingAspect) || within(com.jfi.api.employee.adapter.in.rest.EmployeeExceptionHandler) || within(com.jfi.api.employee.adapter.in.rest.RequestIdFilter) || within(com.jfi.api.employee.adapter.in.rest.RequestLoggingFilter)"
+    )
+    public void infrastructure() {}
+
+    @Pointcut("applicationLayer() && !infrastructure()")
     public void applicationMethods() {}
 
     @Around("applicationMethods()")
@@ -33,20 +41,7 @@ public class LoggingAspect {
             return Mono.deferContextual(ctx -> {
                 setMdc(ctx);
                 log.debug("Entering {} with args {}", method, args);
-                return mono
-                    .doOnNext(r -> {
-                        setMdc(ctx);
-                        log.debug("Completed {} with result", method);
-                    })
-                    .doOnError(e -> {
-                        setMdc(ctx);
-                        log.debug(
-                            "Failed {} with error: {}",
-                            method,
-                            e.getMessage()
-                        );
-                    })
-                    .doFinally(s -> MDC.clear());
+                return wrapMono(mono, method, ctx);
             });
         }
 
@@ -54,20 +49,7 @@ public class LoggingAspect {
             return Flux.deferContextual(ctx -> {
                 setMdc(ctx);
                 log.debug("Entering {} with args {}", method, args);
-                return flux
-                    .doOnComplete(() -> {
-                        setMdc(ctx);
-                        log.debug("Completed {}", method);
-                    })
-                    .doOnError(e -> {
-                        setMdc(ctx);
-                        log.debug(
-                            "Failed {} with error: {}",
-                            method,
-                            e.getMessage()
-                        );
-                    })
-                    .doFinally(s -> MDC.clear());
+                return wrapFlux(flux, method, ctx);
             });
         }
 
@@ -78,6 +60,32 @@ public class LoggingAspect {
             result
         );
         return result;
+    }
+
+    private Mono<?> wrapMono(Mono<?> mono, String method, ContextView ctx) {
+        return mono
+            .doOnNext(r -> {
+                setMdc(ctx);
+                log.debug("Completed {} with result", method);
+            })
+            .doOnError(e -> {
+                setMdc(ctx);
+                log.debug("Failed {} with error: {}", method, e.getMessage());
+            })
+            .doFinally(s -> MDC.clear());
+    }
+
+    private Flux<?> wrapFlux(Flux<?> flux, String method, ContextView ctx) {
+        return flux
+            .doOnComplete(() -> {
+                setMdc(ctx);
+                log.debug("Completed {}", method);
+            })
+            .doOnError(e -> {
+                setMdc(ctx);
+                log.debug("Failed {} with error: {}", method, e.getMessage());
+            })
+            .doFinally(s -> MDC.clear());
     }
 
     private void setMdc(ContextView ctx) {
