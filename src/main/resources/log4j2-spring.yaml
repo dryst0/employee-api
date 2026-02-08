@@ -1,0 +1,26 @@
+Configuration:
+  status: warn
+
+  Properties:
+    Property:
+      name: LOG_PATTERN
+      value: "%d{ISO8601}{UTC} %-5p [%t] [requestId=%X{requestId}] %c{1.} - %m%n"
+
+  Appenders:
+    Console:
+      name: Console
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "${LOG_PATTERN}"
+
+  Loggers:
+    AsyncLogger:
+      name: com.jfi.api
+      level: debug
+      additivity: false
+      AppenderRef:
+        ref: Console
+    Root:
+      level: info
+      AppenderRef:
+        ref: Console
