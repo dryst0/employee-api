@@ -1,4 +1,4 @@
-package com.jfi.api.employee.adapter.in.rest;
+package com.jfi.api.employee.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

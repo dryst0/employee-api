@@ -49,8 +49,9 @@ Package structure per entity:
 - `port/in/` — Driving ports (interfaces called by inbound adapters)
 - `port/out/` — Driven ports (interfaces implemented by outbound adapters)
 - `usecase/` — Use case implementations. Depends on ports only.
-- `adapter/in/rest/` — Inbound adapter: REST controller + DTOs
+- `adapter/in/rest/` — Inbound adapter: REST controller + DTOs + exception handler
 - `adapter/out/persistence/` — Outbound adapter: repository implementations
+- `infrastructure/` — Cross-cutting concerns: filters, aspects, logging infrastructure
 
 Dependency rules (enforced via ArchUnit):
 - **Domain** must not depend on adapters or use cases

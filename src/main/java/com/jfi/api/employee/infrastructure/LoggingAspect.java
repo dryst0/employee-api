@@ -1,4 +1,4 @@
-package com.jfi.api.employee.adapter.in.rest;
+package com.jfi.api.employee.infrastructure;
 
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class LoggingAspect {
     public void applicationLayer() {}
 
     @Pointcut(
-        "within(com.jfi.api.employee.adapter.in.rest.LoggingAspect) || within(com.jfi.api.employee.adapter.in.rest.EmployeeExceptionHandler) || within(com.jfi.api.employee.adapter.in.rest.RequestIdFilter) || within(com.jfi.api.employee.adapter.in.rest.RequestLoggingFilter)"
+        "within(com.jfi.api.employee.adapter.in.rest.EmployeeExceptionHandler)"
     )
     public void infrastructure() {}
 
