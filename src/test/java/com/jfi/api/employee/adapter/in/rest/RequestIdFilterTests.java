@@ -94,7 +94,7 @@ class RequestIdFilterTests {
         String header = exchange
             .getResponse()
             .getHeaders()
-            .getFirst("X-Request-Id");
+            .getFirst(RequestIdFilter.REQUEST_ID_HEADER);
         assertDoesNotThrow(() -> UUID.fromString(header));
     }
 

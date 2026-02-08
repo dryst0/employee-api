@@ -13,11 +13,12 @@ import reactor.util.context.Context;
 public class RequestIdFilter implements WebFilter {
 
     static final String REQUEST_ID_KEY = "requestId";
+    static final String REQUEST_ID_HEADER = "X-Request-Id";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String requestId = UUID.randomUUID().toString();
-        exchange.getResponse().getHeaders().add("X-Request-Id", requestId);
+        exchange.getResponse().getHeaders().add(REQUEST_ID_HEADER, requestId);
         MDC.put(REQUEST_ID_KEY, requestId);
         return chain
             .filter(exchange)
