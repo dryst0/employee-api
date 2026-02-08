@@ -155,6 +155,16 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<image>
+						<name>ghcr.io/dryst0/employee-api:${project.version}</name>
+						<builder>paketobuildpacks/builder-jammy-tiny</builder>
+						<env>
+							<BP_JVM_VERSION>25</BP_JVM_VERSION>
+							<BP_JVM_TYPE>JRE</BP_JVM_TYPE>
+							<BP_JVM_CDS_ENABLED>true</BP_JVM_CDS_ENABLED>
+							<BPL_JVM_CDS_ENABLED>true</BPL_JVM_CDS_ENABLED>
+						</env>
+					</image>
 				</configuration>
 				<executions>
 					<execution>

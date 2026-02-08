@@ -95,6 +95,26 @@ Tests follow TDD (Red-Green-Refactor) and BDD conventions (given/when/then), pre
 - **Architecture tests** — ArchUnit enforces hexagonal dependency rules
 - **DTO tests** — validates record contracts and domain-to-DTO mapping
 
+## Container
+
+Build the container image using Spring Boot Buildpacks (no Dockerfile needed):
+
+```bash
+./mvnw spring-boot:build-image
+```
+
+Run the container:
+
+```bash
+docker run -p 8080:8080 ghcr.io/dryst0/employee-api:0.0.1-SNAPSHOT
+```
+
+Push to GitHub Container Registry:
+
+```bash
+docker push ghcr.io/dryst0/employee-api:0.0.1-SNAPSHOT
+```
+
 ## License
 
 This project is for demonstration purposes.
