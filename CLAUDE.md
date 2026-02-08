@@ -44,14 +44,16 @@ The entire stack is non-blocking: **Spring WebFlux** (Netty server) + **R2DBC** 
 
 Organized by domain entity, then by hexagonal role. Each entity package is self-contained.
 
-Package structure per entity:
+Application-level package (`com.jfi.api`):
+- `infrastructure/` — Cross-cutting concerns shared across all entities: filters, aspects, logging infrastructure
+
+Package structure per entity (`com.jfi.api.employee`):
 - `domain/` — Domain models and enums. No framework dependencies.
 - `port/in/` — Driving ports (interfaces called by inbound adapters)
 - `port/out/` — Driven ports (interfaces implemented by outbound adapters)
 - `usecase/` — Use case implementations. Depends on ports only.
 - `adapter/in/rest/` — Inbound adapter: REST controller + DTOs + exception handler
 - `adapter/out/persistence/` — Outbound adapter: repository implementations
-- `infrastructure/` — Cross-cutting concerns: filters, aspects, logging infrastructure
 
 Dependency rules (enforced via ArchUnit):
 - **Domain** must not depend on adapters or use cases

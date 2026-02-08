@@ -1,4 +1,4 @@
-package com.jfi.api.employee.infrastructure;
+package com.jfi.api.infrastructure;
 
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;

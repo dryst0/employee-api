@@ -1,4 +1,4 @@
-package com.jfi.api.employee.infrastructure;
+package com.jfi.api.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
