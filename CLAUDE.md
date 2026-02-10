@@ -80,7 +80,7 @@ Dependency rules (enforced via ArchUnit):
 ### Git Conventions
 
 - **Conventional Commits**: Use the format `type(scope): description` (e.g., `feat(employee): add GET endpoints`, `fix(dto): correct default employee type`, `refactor(usecase): extract mapping logic`). Common types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `build`.
-- **Commit messages**: Keep short and concise. Always explain **why** the change was made. Include **what** only when not obvious from the diff.
+- **Commit messages**: Keep short and concise. The subject line should convey **why** the change was made. Include **what** changed only when not obvious from the diff — if the diff speaks for itself, don't repeat it in the message.
 - **Small green commits**: Always commit small, incremental changes that are green (all tests pass). Never commit large changes in one go. Each commit should be a single logical unit — one feature, one refactor step, or one bug fix.
 - **Only commit on green**: Never commit failing tests. The TDD RED phase (failing test) is transient local working state — commit only once the test passes (GREEN). The RED-GREEN gap lives in your working tree, not in version control.
 - **Semantic Versioning**: Use `MAJOR.MINOR.PATCH` for releases. Use `-SNAPSHOT` suffix during development. Bump MAJOR for breaking changes, MINOR for new features, PATCH for bug fixes. The POM version is used as the container image tag.
