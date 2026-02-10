@@ -13,7 +13,7 @@ import reactor.test.StepVerifier;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-class EmployeePersistenceIntegrationTests {
+class EmployeePersistenceIT {
 
     @Autowired
     private EmployeePersistence employeePersistence;
