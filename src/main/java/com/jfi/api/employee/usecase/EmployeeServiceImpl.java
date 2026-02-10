@@ -2,7 +2,7 @@ package com.jfi.api.employee.usecase;
 
 import com.jfi.api.employee.domain.Employee;
 import com.jfi.api.employee.port.in.EmployeeService;
-import com.jfi.api.employee.port.out.EmployeeRepository;
+import com.jfi.api.employee.port.out.EmployeePersistence;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -11,19 +11,19 @@ import reactor.core.publisher.Mono;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
+    private final EmployeePersistence employeePersistence;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+    public EmployeeServiceImpl(EmployeePersistence employeePersistence) {
+        this.employeePersistence = employeePersistence;
     }
 
     @Override
     public Flux<Employee> findAllEmployees() {
-        return employeeRepository.getEmployees();
+        return employeePersistence.getEmployees();
     }
 
     @Override
     public Mono<Employee> findEmployeeById(UUID uuid) {
-        return employeeRepository.getEmployeeById(uuid);
+        return employeePersistence.getEmployeeById(uuid);
     }
 }

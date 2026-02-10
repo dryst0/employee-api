@@ -1,6 +1,6 @@
 package com.jfi.api.employee.usecase;
 
-import com.jfi.api.employee.adapter.out.persistence.FakeEmployeeRepository;
+import com.jfi.api.employee.adapter.out.persistence.FakeEmployeePersistence;
 import com.jfi.api.employee.domain.Employee;
 import com.jfi.api.employee.domain.EmployeeType;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import reactor.test.StepVerifier;
 
 class EmployeeServiceImplTests {
 
-    FakeEmployeeRepository employeeRepository;
+    FakeEmployeePersistence employeePersistence;
     EmployeeServiceImpl employeeService;
 
     Employee workerEntity;
@@ -19,8 +19,8 @@ class EmployeeServiceImplTests {
 
     @BeforeEach
     void setup() {
-        employeeRepository = new FakeEmployeeRepository();
-        employeeService = new EmployeeServiceImpl(employeeRepository);
+        employeePersistence = new FakeEmployeePersistence();
+        employeeService = new EmployeeServiceImpl(employeePersistence);
 
         workerEntity = Employee.builder()
             .uuid(UUID.randomUUID())
@@ -41,9 +41,9 @@ class EmployeeServiceImplTests {
             .employeeType(EmployeeType.FINANCE_MANAGER)
             .build();
 
-        employeeRepository.save(workerEntity);
-        employeeRepository.save(managerEntity);
-        employeeRepository.save(financeManagerEntity);
+        employeePersistence.save(workerEntity);
+        employeePersistence.save(managerEntity);
+        employeePersistence.save(financeManagerEntity);
     }
 
     @Test
