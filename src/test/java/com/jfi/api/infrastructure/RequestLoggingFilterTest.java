@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.context.Context;
 
-class RequestLoggingFilterTests {
+class RequestLoggingFilterTest {
 
     RequestLoggingFilter filter = new RequestLoggingFilter();
 

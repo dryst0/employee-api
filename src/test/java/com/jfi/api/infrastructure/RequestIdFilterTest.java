@@ -11,7 +11,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-class RequestIdFilterTests {
+class RequestIdFilterTest {
 
     RequestIdFilter filter = new RequestIdFilter();
 

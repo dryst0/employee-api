@@ -7,7 +7,7 @@ import com.jfi.api.employee.domain.EmployeeType;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-class EmployeeDTOTests {
+class EmployeeDTOTest {
 
     @Test
     void givenValues_whenConstructed_thenReturnEmployeeDTO() {

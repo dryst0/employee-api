@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.context.Context;
 
-class LoggingAspectTests {
+class LoggingAspectTest {
 
     LoggingAspect loggingAspect;
 

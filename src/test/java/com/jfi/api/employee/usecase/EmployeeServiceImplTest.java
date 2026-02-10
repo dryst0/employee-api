@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-class EmployeeServiceImplTests {
+class EmployeeServiceImplTest {
 
     FakeEmployeePersistence employeePersistence;
     EmployeeServiceImpl employeeService;

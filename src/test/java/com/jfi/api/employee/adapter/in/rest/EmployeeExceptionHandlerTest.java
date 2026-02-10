@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 
-class EmployeeExceptionHandlerTests {
+class EmployeeExceptionHandlerTest {
 
     EmployeeExceptionHandler handler = new EmployeeExceptionHandler();
 
