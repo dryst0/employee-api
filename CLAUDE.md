@@ -78,7 +78,7 @@ Dependency rules (enforced via ArchUnit):
 - **Log levels**: DEBUG for method-level tracing (e.g., AOP aspect). INFO for successful operations, handled client errors (4xx), and expected failures. WARN for errors the application recovers from. ERROR only for unhandled failures (5xx). Use typed checks like `HttpStatusCode.is5xxServerError()` instead of magic numbers.
 - **No magic numbers or strings**: Use framework-provided constants, enums, or typed methods instead of raw numeric literals or string literals (e.g., `status.is5xxServerError()` not `code >= 500`; `RequestIdFilter.REQUEST_ID_KEY` not `"requestId"`).
 - **Monitoring**: Spring Boot Actuator is included for health/metrics endpoints.
-- **Database**: PostgreSQL with Spring Data R2DBC. The `Employee` entity uses `@Table`/`@Id` annotations. Schema managed via `schema.sql` with `spring.sql.init.mode=always`.
+- **Database**: PostgreSQL with Spring Data R2DBC. The `Employee` entity uses `@Table`/`@Id` annotations. Schema managed via Flyway migrations in `src/main/resources/db/migration/` using timestamp-based versioning (`V{yyyyMMddHHmmss}__description.sql`).
 - **Docker Compose**: `compose.yaml` at project root defines the PostgreSQL container. Spring Boot Docker Compose support (`spring-boot-docker-compose`) auto-starts/stops the container with `./mvnw spring-boot:run`.
 
 ### Git Conventions
@@ -102,6 +102,7 @@ Dependency rules (enforced via ArchUnit):
 
 - **TDD (Red-Green-Refactor)**: Always write a failing test first (Red), then write the minimum production code to make it pass (Green), then refactor. Never introduce new behavior without a failing test driving it.
 - **BDD approach**: Tests should describe and verify behaviors, not implementation details. Structure tests around what the system does (given/when/then), not how it does it. Test names should read as behavior specifications.
+- **Test isolation**: Tests must be independent — they must not depend on execution order or state left by other tests. Each test sets up its own preconditions and must pass whether run alone or with the full suite.
 - **Fakes over mocks**: Default to fakes (in-memory implementations of interfaces) for collaborators you own — they test real behavior and don't break when internals are refactored. Use mocks only for boundaries you don't own (external APIs, third-party libraries) or to simulate failure scenarios.
 - **Unit tests**: Fakes + StepVerifier for reactive service/use case tests.
 - **Integration tests**: `@SpringBootTest` + Testcontainers with `@ServiceConnection` for real database testing. Pre-populate test data via `DatabaseClient`, test through the port interface.
