@@ -211,8 +211,9 @@
 						<env>
 							<BP_JVM_VERSION>25</BP_JVM_VERSION>
 							<BP_JVM_TYPE>JRE</BP_JVM_TYPE>
-							<BP_JVM_CDS_ENABLED>true</BP_JVM_CDS_ENABLED>
-							<BPL_JVM_CDS_ENABLED>true</BPL_JVM_CDS_ENABLED>
+							<!-- CDS disabled: Java 25 AOT cache exits with code 1 despite success.
+							     See https://github.com/paketo-buildpacks/spring-boot/issues/581 -->
+							<BP_JVM_CDS_ENABLED>false</BP_JVM_CDS_ENABLED>
 						</env>
 					</image>
 				</configuration>
