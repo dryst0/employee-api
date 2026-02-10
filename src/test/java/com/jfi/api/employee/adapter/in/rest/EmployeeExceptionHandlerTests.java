@@ -2,7 +2,6 @@ package com.jfi.api.employee.adapter.in.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.net.URI;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
