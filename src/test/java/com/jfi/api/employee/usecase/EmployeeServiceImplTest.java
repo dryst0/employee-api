@@ -117,7 +117,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenExistingEmployee_whenEmployeeIsUpdated_thenProvidesTheEmployee() {
+    void givenExistingEmployee_whenEmployeeInformationIsChanged_thenProvidesTheEmployee() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee updated = Employee.builder()
@@ -139,7 +139,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenEmployeeIsUpdated_thenEmployeeIsNotUpdated() {
+    void givenBlankFirstName_whenEmployeeInformationIsChanged_thenEmployeeInformationIsNotChanged() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee invalid = Employee.builder()

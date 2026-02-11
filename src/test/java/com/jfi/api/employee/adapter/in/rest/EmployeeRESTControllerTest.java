@@ -119,7 +119,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenExistingEmployee_whenEmployeeIsUpdated_thenProvidesTheEmployee() {
+    void givenExistingEmployee_whenEmployeeInformationIsChanged_thenProvidesTheEmployee() {
         // given
         UUID workerId = worker.getUuid();
         EmployeeRequest request = new EmployeeRequest(
@@ -141,7 +141,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenNonExistentEmployee_whenEmployeeIsUpdated_thenEmployeeIsNotFound() {
+    void givenNonExistentEmployee_whenEmployeeInformationIsChanged_thenEmployeeIsNotFound() {
         // given
         UUID unknownId = UUID.randomUUID();
         EmployeeRequest request = new EmployeeRequest(
