@@ -6,6 +6,7 @@ import com.jfi.api.employee.domain.EmployeeType;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import reactor.test.StepVerifier;
 
 class EmployeeRESTControllerTest {
@@ -68,6 +69,50 @@ class EmployeeRESTControllerTest {
                     dto.firstName().equals("Juan") &&
                     dto.lastName().equals("dela Cruz") &&
                     dto.employeeType() == EmployeeType.WORKER
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void givenValidEmployee_whenCreated_thenReturnsCreatedEmployee() {
+        // given
+        EmployeeRequest request = new EmployeeRequest(
+            "Pedro",
+            "Garcia",
+            EmployeeType.WORKER
+        );
+
+        // when / then
+        StepVerifier.create(controller.createEmployee(request))
+            .expectNextMatches(
+                response ->
+                    response.getStatusCode() == HttpStatus.CREATED &&
+                    response.getBody() != null &&
+                    response.getBody().firstName().equals("Pedro") &&
+                    response.getBody().lastName().equals("Garcia")
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void givenValidEmployee_whenCreated_thenReturnedWithLocation() {
+        // given
+        EmployeeRequest request = new EmployeeRequest(
+            "Pedro",
+            "Garcia",
+            EmployeeType.WORKER
+        );
+
+        // when / then
+        StepVerifier.create(controller.createEmployee(request))
+            .expectNextMatches(
+                response ->
+                    response.getHeaders().getLocation() != null &&
+                    response
+                        .getHeaders()
+                        .getLocation()
+                        .getPath()
+                        .contains("/employees/")
             )
             .verifyComplete();
     }
