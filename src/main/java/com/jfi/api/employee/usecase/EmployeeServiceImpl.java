@@ -1,6 +1,7 @@
 package com.jfi.api.employee.usecase;
 
 import com.jfi.api.employee.domain.Employee;
+import com.jfi.api.employee.domain.InvalidEmployeeException;
 import com.jfi.api.employee.port.in.EmployeeService;
 import com.jfi.api.employee.port.out.EmployeePersistence;
 import java.util.UUID;
@@ -25,5 +26,31 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Mono<Employee> findEmployeeById(UUID uuid) {
         return employeePersistence.getEmployeeById(uuid);
+    }
+
+    @Override
+    public Mono<Employee> createEmployee(Employee employee) {
+        return Mono.defer(() -> {
+            validateEmployee(employee);
+            return employeePersistence.saveEmployee(employee);
+        });
+    }
+
+    private void validateEmployee(Employee employee) {
+        if (
+            employee.getFirstName() == null || employee.getFirstName().isBlank()
+        ) {
+            throw new InvalidEmployeeException("First name must not be blank");
+        }
+        if (
+            employee.getLastName() == null || employee.getLastName().isBlank()
+        ) {
+            throw new InvalidEmployeeException("Last name must not be blank");
+        }
+        if (employee.getEmployeeType() == null) {
+            throw new InvalidEmployeeException(
+                "Employee type must not be null"
+            );
+        }
     }
 }

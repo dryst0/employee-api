@@ -9,4 +9,6 @@ public interface EmployeeService {
     Flux<Employee> findAllEmployees();
 
     Mono<Employee> findEmployeeById(UUID uuid);
+
+    Mono<Employee> createEmployee(Employee employee);
 }

@@ -3,6 +3,7 @@ package com.jfi.api.employee.usecase;
 import com.jfi.api.employee.adapter.out.persistence.FakeEmployeePersistence;
 import com.jfi.api.employee.domain.Employee;
 import com.jfi.api.employee.domain.EmployeeType;
+import com.jfi.api.employee.domain.InvalidEmployeeException;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,57 @@ class EmployeeServiceImplTest {
                     employee.getEmployeeType() == EmployeeType.WORKER
             )
             .verifyComplete();
+    }
+
+    @Test
+    void givenValidEmployee_whenCreate_thenReturnsSavedEmployee() {
+        // given
+        Employee newEmployee = Employee.builder()
+            .firstName("Pedro")
+            .lastName("Garcia")
+            .employeeType(EmployeeType.WORKER)
+            .build();
+
+        // when / then
+        StepVerifier.create(employeeService.createEmployee(newEmployee))
+            .expectNextMatches(
+                saved ->
+                    saved.getUuid() != null &&
+                    saved.getFirstName().equals("Pedro") &&
+                    saved.getLastName().equals("Garcia") &&
+                    saved.getEmployeeType() == EmployeeType.WORKER
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void givenBlankFirstName_whenCreate_thenRejects() {
+        // given
+        Employee invalid = Employee.builder()
+            .firstName("  ")
+            .lastName("Garcia")
+            .employeeType(EmployeeType.WORKER)
+            .build();
+
+        // when / then
+        StepVerifier.create(employeeService.createEmployee(invalid))
+            .expectError(InvalidEmployeeException.class)
+            .verify();
+    }
+
+    @Test
+    void givenNullEmployeeType_whenCreate_thenRejects() {
+        // given
+        Employee invalid = Employee.builder()
+            .firstName("Pedro")
+            .lastName("Garcia")
+            .employeeType(null)
+            .build();
+
+        // when / then
+        StepVerifier.create(employeeService.createEmployee(invalid))
+            .expectError(InvalidEmployeeException.class)
+            .verify();
     }
 
     @Test
