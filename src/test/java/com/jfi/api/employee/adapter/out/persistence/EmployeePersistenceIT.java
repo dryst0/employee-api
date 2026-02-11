@@ -91,6 +91,19 @@ class EmployeePersistenceIT {
     }
 
     @Test
+    void givenExistingEmployee_whenDeleted_thenRemovedFromStorage() {
+        // when
+        StepVerifier.create(
+            employeePersistence.deleteEmployee(workerUuid)
+        ).verifyComplete();
+
+        // then
+        StepVerifier.create(
+            employeePersistence.getEmployeeById(workerUuid)
+        ).verifyComplete();
+    }
+
+    @Test
     void givenNoEmployee_whenGetEmployeeById_thenReturnsEmpty() {
         StepVerifier.create(
             employeePersistence.getEmployeeById(UUID.randomUUID())

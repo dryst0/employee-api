@@ -11,4 +11,6 @@ public interface EmployeePersistence {
     Mono<Employee> getEmployeeById(UUID uuid);
 
     Mono<Employee> saveEmployee(Employee employee);
+
+    Mono<Void> deleteEmployee(UUID uuid);
 }

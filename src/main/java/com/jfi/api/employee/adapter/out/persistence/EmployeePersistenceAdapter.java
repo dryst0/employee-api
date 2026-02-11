@@ -30,4 +30,9 @@ public class EmployeePersistenceAdapter implements EmployeePersistence {
     public Mono<Employee> saveEmployee(Employee employee) {
         return r2dbcRepository.save(employee);
     }
+
+    @Override
+    public Mono<Void> deleteEmployee(UUID uuid) {
+        return r2dbcRepository.deleteById(uuid);
+    }
 }

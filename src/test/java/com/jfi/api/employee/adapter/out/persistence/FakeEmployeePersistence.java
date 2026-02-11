@@ -27,6 +27,12 @@ public class FakeEmployeePersistence implements EmployeePersistence {
     }
 
     @Override
+    public Mono<Void> deleteEmployee(UUID uuid) {
+        employees.remove(uuid);
+        return Mono.empty();
+    }
+
+    @Override
     public Mono<Employee> saveEmployee(Employee employee) {
         if (employee.getUuid() == null) {
             employee.setUuid(UUID.randomUUID());
