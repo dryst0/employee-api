@@ -51,14 +51,14 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenEmployeesExist_whenGetEmployees_thenListsAllEmployees() {
+    void givenEmployeesExist_whenAllEmployeesAreLookedUp_thenListsAllEmployees() {
         StepVerifier.create(employeePersistence.getEmployees())
             .expectNextCount(2)
             .verifyComplete();
     }
 
     @Test
-    void givenEmployeeExists_whenGetEmployeeById_thenProvidesTheEmployee() {
+    void givenEmployeeExists_whenEmployeeIsLookedUp_thenProvidesTheEmployee() {
         StepVerifier.create(employeePersistence.getEmployeeById(workerUuid))
             .expectNextMatches(
                 employee ->
@@ -70,7 +70,7 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenNewEmployee_whenSaved_thenStoresAndProvidesTheEmployee() {
+    void givenNewEmployee_whenEmployeeIsAdded_thenStoresAndProvidesTheEmployee() {
         // given
         Employee newEmployee = Employee.builder()
             .firstName("Pedro")
@@ -91,7 +91,7 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenExistingEmployee_whenDeleted_thenRemovedFromStorage() {
+    void givenExistingEmployee_whenEmployeeIsRemoved_thenRemovedFromStorage() {
         // when
         StepVerifier.create(
             employeePersistence.deleteEmployee(workerUuid)
@@ -104,7 +104,7 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenNoEmployee_whenGetEmployeeById_thenFindsNothing() {
+    void givenNoEmployee_whenEmployeeIsLookedUp_thenFindsNothing() {
         StepVerifier.create(
             employeePersistence.getEmployeeById(UUID.randomUUID())
         ).verifyComplete();

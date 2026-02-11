@@ -41,7 +41,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenEmployeesExist_whenGetAllEmployees_thenListsAllEmployees() {
+    void givenEmployeesExist_whenAllEmployeesAreLookedUp_thenListsAllEmployees() {
         // when / then
         StepVerifier.create(controller.getAllEmployees())
             .expectNextMatches(
@@ -58,7 +58,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenEmployeeExists_whenGetById_thenProvidesTheEmployee() {
+    void givenEmployeeExists_whenEmployeeIsLookedUp_thenProvidesTheEmployee() {
         // given
         UUID workerId = worker.getUuid();
 
@@ -119,7 +119,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenExistingEmployee_whenUpdate_thenProvidesTheEmployee() {
+    void givenExistingEmployee_whenEmployeeIsUpdated_thenProvidesTheEmployee() {
         // given
         UUID workerId = worker.getUuid();
         EmployeeRequest request = new EmployeeRequest(
@@ -141,7 +141,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenNonExistentEmployee_whenUpdate_thenEmployeeIsNotFound() {
+    void givenNonExistentEmployee_whenEmployeeIsUpdated_thenEmployeeIsNotFound() {
         // given
         UUID unknownId = UUID.randomUUID();
         EmployeeRequest request = new EmployeeRequest(
@@ -157,7 +157,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenExistingEmployee_whenPatch_thenProvidesTheEmployee() {
+    void givenExistingEmployee_whenEmployeeIsChanged_thenProvidesTheEmployee() {
         // given
         UUID workerId = worker.getUuid();
         EmployeePatchRequest request = new EmployeePatchRequest(
@@ -179,7 +179,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenNonExistentEmployee_whenPatch_thenEmployeeIsNotFound() {
+    void givenNonExistentEmployee_whenEmployeeIsChanged_thenEmployeeIsNotFound() {
         // given
         UUID unknownId = UUID.randomUUID();
         EmployeePatchRequest request = new EmployeePatchRequest(
@@ -195,7 +195,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenExistingEmployee_whenDelete_thenConfirmsRemoval() {
+    void givenExistingEmployee_whenEmployeeIsRemoved_thenConfirmsRemoval() {
         // given
         UUID workerId = worker.getUuid();
 
@@ -208,7 +208,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenNonExistentEmployee_whenDelete_thenEmployeeIsNotFound() {
+    void givenNonExistentEmployee_whenEmployeeIsRemoved_thenEmployeeIsNotFound() {
         // given
         UUID unknownId = UUID.randomUUID();
 
@@ -219,7 +219,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenEmployeeDoesNotExist_whenGetById_thenEmployeeIsNotFound() {
+    void givenEmployeeDoesNotExist_whenEmployeeIsLookedUp_thenEmployeeIsNotFound() {
         // given
         UUID unknownId = UUID.randomUUID();
 
