@@ -25,4 +25,9 @@ public class EmployeePersistenceAdapter implements EmployeePersistence {
     public Mono<Employee> getEmployeeById(UUID uuid) {
         return r2dbcRepository.findById(uuid);
     }
+
+    @Override
+    public Mono<Employee> saveEmployee(Employee employee) {
+        return r2dbcRepository.save(employee);
+    }
 }

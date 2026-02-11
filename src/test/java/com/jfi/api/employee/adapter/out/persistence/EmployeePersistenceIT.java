@@ -1,5 +1,6 @@
 package com.jfi.api.employee.adapter.out.persistence;
 
+import com.jfi.api.employee.domain.Employee;
 import com.jfi.api.employee.domain.EmployeeType;
 import com.jfi.api.employee.port.out.EmployeePersistence;
 import java.util.UUID;
@@ -64,6 +65,27 @@ class EmployeePersistenceIT {
                     employee.getFirstName().equals("Juan") &&
                     employee.getLastName().equals("dela Cruz") &&
                     employee.getEmployeeType() == EmployeeType.WORKER
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void givenNewEmployee_whenSaved_thenPersistsAndReturns() {
+        // given
+        Employee newEmployee = Employee.builder()
+            .firstName("Pedro")
+            .lastName("Garcia")
+            .employeeType(EmployeeType.WORKER)
+            .build();
+
+        // when / then
+        StepVerifier.create(employeePersistence.saveEmployee(newEmployee))
+            .expectNextMatches(
+                saved ->
+                    saved.getUuid() != null &&
+                    saved.getFirstName().equals("Pedro") &&
+                    saved.getLastName().equals("Garcia") &&
+                    saved.getEmployeeType() == EmployeeType.WORKER
             )
             .verifyComplete();
     }

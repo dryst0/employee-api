@@ -9,4 +9,6 @@ public interface EmployeePersistence {
     Flux<Employee> getEmployees();
 
     Mono<Employee> getEmployeeById(UUID uuid);
+
+    Mono<Employee> saveEmployee(Employee employee);
 }
