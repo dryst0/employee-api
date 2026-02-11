@@ -14,7 +14,7 @@ class EmployeeExceptionHandlerTest {
     EmployeeExceptionHandler handler = new EmployeeExceptionHandler();
 
     @Test
-    void givenTheEmployeeIsNotStored_whenHandled_thenEmployeeIsNotFound() {
+    void givenTheEmployeeIsNotStored_whenTheProblemIsReported_thenEmployeeIsNotFound() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -29,7 +29,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenTheEmployeeIsNotStored_whenHandled_thenDescribesTheProblem() {
+    void givenTheEmployeeIsNotStored_whenTheProblemIsReported_thenDescribesTheProblem() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -47,7 +47,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenTheEmployeeIsNotStored_whenHandled_thenIdentifiesTheMissingEmployee() {
+    void givenTheEmployeeIsNotStored_whenTheProblemIsReported_thenIdentifiesTheMissingEmployee() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -65,7 +65,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenHandled_thenRejectsBadInput() {
+    void givenInvalidEmployee_whenTheProblemIsReported_thenRejectsBadInput() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
@@ -79,7 +79,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenHandled_thenDescribesTheProblem() {
+    void givenInvalidEmployee_whenTheProblemIsReported_thenDescribesTheProblem() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
@@ -96,7 +96,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenHandled_thenExplainsWhatIsWrong() {
+    void givenInvalidEmployee_whenTheProblemIsReported_thenExplainsWhatIsWrong() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
@@ -110,7 +110,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenTheEmployeeIsNotStored_whenHandled_thenDescribesGenericProblem() {
+    void givenTheEmployeeIsNotStored_whenTheProblemIsReported_thenDescribesGenericProblem() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
