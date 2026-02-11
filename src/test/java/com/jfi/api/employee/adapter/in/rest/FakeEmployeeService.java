@@ -1,6 +1,7 @@
 package com.jfi.api.employee.adapter.in.rest;
 
 import com.jfi.api.employee.domain.Employee;
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import com.jfi.api.employee.port.in.EmployeeService;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,6 +29,9 @@ public class FakeEmployeeService implements EmployeeService {
 
     @Override
     public Mono<Employee> updateEmployee(UUID uuid, Employee employee) {
+        if (!employees.containsKey(uuid)) {
+            return Mono.error(new EmployeeNotFoundException(uuid));
+        }
         employee.setUuid(uuid);
         employees.put(uuid, employee);
         return Mono.just(employee);
