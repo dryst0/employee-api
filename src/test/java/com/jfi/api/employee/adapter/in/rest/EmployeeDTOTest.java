@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class EmployeeDTOTest {
 
     @Test
-    void givenValues_whenConstructed_thenPreservesAllFields() {
+    void givenEmployeeInformation_whenEmployeeIsAdded_thenGivenAndAddedInformationMustBeTheSame() {
         UUID uuid = UUID.randomUUID();
         String firstName = "Juan";
         String lastName = "dela Cruz";
@@ -28,7 +28,7 @@ class EmployeeDTOTest {
     }
 
     @Test
-    void givenNoEmployeeType_whenConstructed_thenDefaultToWorker() {
+    void givenAnEmployeeWithoutEmployeeType_whenEmployeeIsAdded_thenAddedEmployeeShouldHaveEmployeeTypeAsWorker() {
         UUID uuid = UUID.randomUUID();
         EmployeeDTO employeeDTO = new EmployeeDTO(uuid, "Juan", "dela Cruz");
 
@@ -36,7 +36,7 @@ class EmployeeDTOTest {
     }
 
     @Test
-    void givenEmployee_whenConverted_thenPreservesAllFields() {
+    void givenExistingEmployee_whenEmployeeIsViewed_thenGivenAndViewedInformationMustBeTheSame() {
         // given
         UUID uuid = UUID.randomUUID();
         Employee employee = Employee.builder()

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class EmployeePatchRequestTest {
 
     @Test
-    void givenPartialFields_whenConvertedToEmployee_thenMapsOnlyProvidedFields() {
+    void givenOnlyFirstName_whenEmployeeIsAdded_thenOnlyFirstNameShouldBeChanged() {
         // given
         EmployeePatchRequest request = new EmployeePatchRequest(
             "Maria",

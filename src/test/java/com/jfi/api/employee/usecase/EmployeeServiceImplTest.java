@@ -49,7 +49,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenEmployeeId_whenFindById_thenReturnEmployee() {
+    void givenEmployeeId_whenFindById_thenProvidesTheEmployee() {
         // given
         UUID workerId = workerEntity.getUuid();
 
@@ -66,7 +66,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenValidEmployee_whenCreate_thenReturnsSavedEmployee() {
+    void givenValidEmployee_whenCreate_thenProvidesTheNewEmployee() {
         // given
         Employee newEmployee = Employee.builder()
             .firstName("Pedro")
@@ -117,7 +117,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenExistingEmployee_whenUpdate_thenReturnsSavedEmployee() {
+    void givenExistingEmployee_whenUpdate_thenProvidesTheEmployee() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee updated = Employee.builder()
@@ -155,7 +155,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenExistingEmployee_whenPatchFirstName_thenReturnsMergedEmployee() {
+    void givenExistingEmployee_whenPatchFirstName_thenProvidesTheEmployee() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee patch = Employee.builder().firstName("Maria").build();
@@ -201,7 +201,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenNonExistentEmployee_whenDelete_thenReportsNotFound() {
+    void givenNonExistentEmployee_whenDelete_thenEmployeeIsNotFound() {
         // given
         UUID unknownId = UUID.randomUUID();
 
@@ -212,7 +212,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenNoParameters_whenFindAll_thenReturnAllEmployees() {
+    void givenNoParameters_whenFindAll_thenListsAllEmployees() {
         // when / then
         StepVerifier.create(employeeService.findAllEmployees())
             .expectNextMatches(e -> e.getUuid().equals(workerEntity.getUuid()))

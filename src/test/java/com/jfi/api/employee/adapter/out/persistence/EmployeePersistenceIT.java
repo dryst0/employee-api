@@ -51,14 +51,14 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenEmployeesExist_whenGetEmployees_thenReturnsAll() {
+    void givenEmployeesExist_whenGetEmployees_thenListsAllEmployees() {
         StepVerifier.create(employeePersistence.getEmployees())
             .expectNextCount(2)
             .verifyComplete();
     }
 
     @Test
-    void givenEmployeeExists_whenGetEmployeeById_thenReturnsEmployee() {
+    void givenEmployeeExists_whenGetEmployeeById_thenProvidesTheEmployee() {
         StepVerifier.create(employeePersistence.getEmployeeById(workerUuid))
             .expectNextMatches(
                 employee ->
@@ -70,7 +70,7 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenNewEmployee_whenSaved_thenPersistsAndReturns() {
+    void givenNewEmployee_whenSaved_thenStoresAndProvidesTheEmployee() {
         // given
         Employee newEmployee = Employee.builder()
             .firstName("Pedro")
@@ -104,7 +104,7 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenNoEmployee_whenGetEmployeeById_thenReturnsEmpty() {
+    void givenNoEmployee_whenGetEmployeeById_thenFindsNothing() {
         StepVerifier.create(
             employeePersistence.getEmployeeById(UUID.randomUUID())
         ).verifyComplete();

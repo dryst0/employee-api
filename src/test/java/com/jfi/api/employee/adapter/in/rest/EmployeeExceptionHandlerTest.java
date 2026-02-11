@@ -14,7 +14,7 @@ class EmployeeExceptionHandlerTest {
     EmployeeExceptionHandler handler = new EmployeeExceptionHandler();
 
     @Test
-    void givenEmployeeNotFound_whenHandled_thenReportsNotFound() {
+    void givenEmployeeNotFound_whenHandled_thenEmployeeIsNotFound() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -29,7 +29,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenEmployeeNotFound_whenHandled_thenDescribesTheError() {
+    void givenEmployeeNotFound_whenHandled_thenDescribesTheProblem() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -79,7 +79,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenHandled_thenDescribesTheError() {
+    void givenInvalidEmployee_whenHandled_thenDescribesTheProblem() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
@@ -110,7 +110,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenEmployeeNotFound_whenHandled_thenUsesStandardErrorFormat() {
+    void givenEmployeeNotFound_whenHandled_thenDescribesGenericProblem() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(

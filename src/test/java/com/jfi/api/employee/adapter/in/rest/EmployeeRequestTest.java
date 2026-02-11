@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class EmployeeRequestTest {
 
     @Test
-    void givenValidFields_whenConvertedToEmployee_thenPreservesAllFields() {
+    void givenEmployeeInformation_whenEmployeeIsAdded_thenGivenAndAddedInformationMustBeTheSame() {
         // given
         EmployeeRequest request = new EmployeeRequest(
             "Pedro",
