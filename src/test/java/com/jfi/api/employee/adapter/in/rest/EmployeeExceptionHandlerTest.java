@@ -3,6 +3,7 @@ package com.jfi.api.employee.adapter.in.rest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.jfi.api.employee.domain.EmployeeNotFoundException;
+import com.jfi.api.employee.domain.InvalidEmployeeException;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,51 @@ class EmployeeExceptionHandlerTest {
             EmployeeNotFoundException.MESSAGE_PREFIX + uuid,
             problem.getDetail()
         );
+    }
+
+    @Test
+    void givenInvalidEmployee_whenHandled_thenRejectsBadInput() {
+        // given
+        InvalidEmployeeException exception = new InvalidEmployeeException(
+            "First name must not be blank"
+        );
+
+        // when
+        ProblemDetail problem = handler.handleInvalidEmployee(exception);
+
+        // then
+        assertEquals(HttpStatus.BAD_REQUEST.value(), problem.getStatus());
+    }
+
+    @Test
+    void givenInvalidEmployee_whenHandled_thenDescribesTheError() {
+        // given
+        InvalidEmployeeException exception = new InvalidEmployeeException(
+            "First name must not be blank"
+        );
+
+        // when
+        ProblemDetail problem = handler.handleInvalidEmployee(exception);
+
+        // then
+        assertEquals(
+            EmployeeExceptionHandler.INVALID_EMPLOYEE_TITLE,
+            problem.getTitle()
+        );
+    }
+
+    @Test
+    void givenInvalidEmployee_whenHandled_thenExplainsWhatIsWrong() {
+        // given
+        InvalidEmployeeException exception = new InvalidEmployeeException(
+            "First name must not be blank"
+        );
+
+        // when
+        ProblemDetail problem = handler.handleInvalidEmployee(exception);
+
+        // then
+        assertEquals("First name must not be blank", problem.getDetail());
     }
 
     @Test
