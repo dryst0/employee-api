@@ -51,6 +51,32 @@ public class EmployeeServiceImpl implements EmployeeService {
             );
     }
 
+    @Override
+    public Mono<Employee> patchEmployee(UUID uuid, Employee employee) {
+        return employeePersistence
+            .getEmployeeById(uuid)
+            .switchIfEmpty(Mono.error(new EmployeeNotFoundException(uuid)))
+            .flatMap(existing ->
+                Mono.defer(() -> {
+                    applyPatch(existing, employee);
+                    validateEmployee(existing);
+                    return employeePersistence.saveEmployee(existing);
+                })
+            );
+    }
+
+    private void applyPatch(Employee existing, Employee patch) {
+        if (patch.getFirstName() != null) {
+            existing.setFirstName(patch.getFirstName());
+        }
+        if (patch.getLastName() != null) {
+            existing.setLastName(patch.getLastName());
+        }
+        if (patch.getEmployeeType() != null) {
+            existing.setEmployeeType(patch.getEmployeeType());
+        }
+    }
+
     private void validateEmployee(Employee employee) {
         if (
             employee.getFirstName() == null || employee.getFirstName().isBlank()

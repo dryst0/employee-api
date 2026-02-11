@@ -154,6 +154,36 @@ class EmployeeServiceImplTest {
     }
 
     @Test
+    void givenExistingEmployee_whenPatchFirstName_thenReturnsMergedEmployee() {
+        // given
+        UUID existingId = workerEntity.getUuid();
+        Employee patch = Employee.builder().firstName("Maria").build();
+
+        // when / then
+        StepVerifier.create(employeeService.patchEmployee(existingId, patch))
+            .expectNextMatches(
+                saved ->
+                    saved.getUuid().equals(existingId) &&
+                    saved.getFirstName().equals("Maria") &&
+                    saved.getLastName().equals("dela Cruz") &&
+                    saved.getEmployeeType() == EmployeeType.WORKER
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void givenBlankFirstName_whenPatch_thenRejects() {
+        // given
+        UUID existingId = workerEntity.getUuid();
+        Employee patch = Employee.builder().firstName("  ").build();
+
+        // when / then
+        StepVerifier.create(employeeService.patchEmployee(existingId, patch))
+            .expectError(InvalidEmployeeException.class)
+            .verify();
+    }
+
+    @Test
     void givenNoParameters_whenFindAll_thenReturnAllEmployees() {
         // when / then
         StepVerifier.create(employeeService.findAllEmployees())

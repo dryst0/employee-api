@@ -38,6 +38,24 @@ public class FakeEmployeeService implements EmployeeService {
     }
 
     @Override
+    public Mono<Employee> patchEmployee(UUID uuid, Employee employee) {
+        if (!employees.containsKey(uuid)) {
+            return Mono.error(new EmployeeNotFoundException(uuid));
+        }
+        Employee existing = employees.get(uuid);
+        if (employee.getFirstName() != null) {
+            existing.setFirstName(employee.getFirstName());
+        }
+        if (employee.getLastName() != null) {
+            existing.setLastName(employee.getLastName());
+        }
+        if (employee.getEmployeeType() != null) {
+            existing.setEmployeeType(employee.getEmployeeType());
+        }
+        return Mono.just(existing);
+    }
+
+    @Override
     public Mono<Employee> createEmployee(Employee employee) {
         if (employee.getUuid() == null) {
             employee.setUuid(UUID.randomUUID());

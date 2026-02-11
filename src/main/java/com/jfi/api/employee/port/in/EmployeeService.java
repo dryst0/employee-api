@@ -13,4 +13,6 @@ public interface EmployeeService {
     Mono<Employee> createEmployee(Employee employee);
 
     Mono<Employee> updateEmployee(UUID uuid, Employee employee);
+
+    Mono<Employee> patchEmployee(UUID uuid, Employee employee);
 }
