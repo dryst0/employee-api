@@ -3,6 +3,7 @@ package com.jfi.api.employee.adapter.in.rest;
 import com.jfi.api.employee.domain.Employee;
 import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import com.jfi.api.employee.domain.EmployeeType;
+import java.net.URI;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,13 +85,15 @@ class EmployeeRESTControllerTest {
 
         // when / then
         StepVerifier.create(controller.createEmployee(request))
-            .expectNextMatches(
-                response ->
+            .expectNextMatches(response -> {
+                EmployeeDTO body = response.getBody();
+                return (
                     response.getStatusCode() == HttpStatus.CREATED &&
-                    response.getBody() != null &&
-                    response.getBody().firstName().equals("Pedro") &&
-                    response.getBody().lastName().equals("Garcia")
-            )
+                    body != null &&
+                    body.firstName().equals("Pedro") &&
+                    body.lastName().equals("Garcia")
+                );
+            })
             .verifyComplete();
     }
 
@@ -105,15 +108,13 @@ class EmployeeRESTControllerTest {
 
         // when / then
         StepVerifier.create(controller.createEmployee(request))
-            .expectNextMatches(
-                response ->
-                    response.getHeaders().getLocation() != null &&
-                    response
-                        .getHeaders()
-                        .getLocation()
-                        .getPath()
-                        .contains("/employees/")
-            )
+            .expectNextMatches(response -> {
+                URI location = response.getHeaders().getLocation();
+                return (
+                    location != null &&
+                    location.getPath().contains("/employees/")
+                );
+            })
             .verifyComplete();
     }
 
