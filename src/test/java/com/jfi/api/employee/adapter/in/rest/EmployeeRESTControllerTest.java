@@ -194,6 +194,30 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
+    void givenExistingEmployee_whenDelete_thenConfirmsRemoval() {
+        // given
+        UUID workerId = worker.getUuid();
+
+        // when / then
+        StepVerifier.create(controller.deleteEmployee(workerId))
+            .expectNextMatches(
+                response -> response.getStatusCode() == HttpStatus.NO_CONTENT
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void givenNonExistentEmployee_whenDelete_thenReportsNotFound() {
+        // given
+        UUID unknownId = UUID.randomUUID();
+
+        // when / then
+        StepVerifier.create(controller.deleteEmployee(unknownId))
+            .expectError(EmployeeNotFoundException.class)
+            .verify();
+    }
+
+    @Test
     void givenEmployeeDoesNotExist_whenGetById_thenError() {
         // given
         UUID unknownId = UUID.randomUUID();

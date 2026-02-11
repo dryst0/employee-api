@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,5 +73,12 @@ public class EmployeeRESTController {
         return employeeService
             .patchEmployee(uuid, request.toEmployee())
             .map(EmployeeDTO::from);
+    }
+
+    @DeleteMapping("/{uuid}")
+    public Mono<ResponseEntity<Void>> deleteEmployee(@PathVariable UUID uuid) {
+        return employeeService
+            .deleteEmployee(uuid)
+            .then(Mono.just(ResponseEntity.noContent().<Void>build()));
     }
 }
