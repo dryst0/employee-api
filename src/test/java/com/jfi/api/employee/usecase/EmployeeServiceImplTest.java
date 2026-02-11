@@ -87,7 +87,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenEmployeeIsAdded_thenRejects() {
+    void givenBlankFirstName_whenEmployeeIsAdded_thenEmployeeIsNotAdded() {
         // given
         Employee invalid = Employee.builder()
             .firstName("  ")
@@ -102,7 +102,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenThatEmployeeTypeIsNotProvided_whenEmployeeIsAdded_thenRejects() {
+    void givenThatEmployeeTypeIsNotProvided_whenEmployeeIsAdded_thenEmployeeIsNotAdded() {
         // given
         Employee invalid = Employee.builder()
             .firstName("Pedro")
@@ -139,7 +139,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenUpdate_thenRejects() {
+    void givenBlankFirstName_whenEmployeeIsUpdated_thenEmployeeIsNotUpdated() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee invalid = Employee.builder()
@@ -173,7 +173,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenPatch_thenRejects() {
+    void givenBlankFirstName_whenEmployeeIsChanged_thenEmployeeIsNotChanged() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee patch = Employee.builder().firstName("  ").build();

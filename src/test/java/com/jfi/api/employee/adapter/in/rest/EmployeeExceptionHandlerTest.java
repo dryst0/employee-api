@@ -65,7 +65,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenTheProblemIsReported_thenRejectsBadInput() {
+    void givenInvalidEmployee_whenTheProblemIsReported_thenEmployeeIsNotAdded() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
