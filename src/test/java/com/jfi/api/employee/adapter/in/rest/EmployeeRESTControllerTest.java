@@ -156,6 +156,44 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
+    void givenExistingEmployee_whenPatch_thenReturnEmployee() {
+        // given
+        UUID workerId = worker.getUuid();
+        EmployeePatchRequest request = new EmployeePatchRequest(
+            "Maria",
+            null,
+            null
+        );
+
+        // when / then
+        StepVerifier.create(controller.patchEmployee(workerId, request))
+            .expectNextMatches(
+                dto ->
+                    dto.uuid().equals(workerId) &&
+                    dto.firstName().equals("Maria") &&
+                    dto.lastName().equals("dela Cruz") &&
+                    dto.employeeType() == EmployeeType.WORKER
+            )
+            .verifyComplete();
+    }
+
+    @Test
+    void givenNonExistentEmployee_whenPatch_thenReportsNotFound() {
+        // given
+        UUID unknownId = UUID.randomUUID();
+        EmployeePatchRequest request = new EmployeePatchRequest(
+            "Maria",
+            null,
+            null
+        );
+
+        // when / then
+        StepVerifier.create(controller.patchEmployee(unknownId, request))
+            .expectError(EmployeeNotFoundException.class)
+            .verify();
+    }
+
+    @Test
     void givenEmployeeDoesNotExist_whenGetById_thenError() {
         // given
         UUID unknownId = UUID.randomUUID();
