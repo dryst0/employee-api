@@ -75,7 +75,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenValidEmployee_whenCreated_thenProvidesTheNewEmployee() {
+    void givenCorrectEmployeeInformation_whenEmployeeIsAdded_thenProvidesTheNewEmployee() {
         // given
         EmployeeRequest request = new EmployeeRequest(
             "Pedro",
@@ -98,7 +98,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenValidEmployee_whenCreated_thenIncludesResourceAddress() {
+    void givenCorrectEmployeeInformation_whenEmployeeIsAdded_thenIncludesResourceAddress() {
         // given
         EmployeeRequest request = new EmployeeRequest(
             "Pedro",

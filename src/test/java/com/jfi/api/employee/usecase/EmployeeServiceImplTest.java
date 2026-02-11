@@ -66,7 +66,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenValidEmployee_whenCreate_thenProvidesTheNewEmployee() {
+    void givenCorrectEmployeeInformation_whenEmployeeIsAdded_thenProvidesTheNewEmployee() {
         // given
         Employee newEmployee = Employee.builder()
             .firstName("Pedro")
