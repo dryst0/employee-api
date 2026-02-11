@@ -27,6 +27,13 @@ public class FakeEmployeeService implements EmployeeService {
     }
 
     @Override
+    public Mono<Employee> updateEmployee(UUID uuid, Employee employee) {
+        employee.setUuid(uuid);
+        employees.put(uuid, employee);
+        return Mono.just(employee);
+    }
+
+    @Override
     public Mono<Employee> createEmployee(Employee employee) {
         if (employee.getUuid() == null) {
             employee.setUuid(UUID.randomUUID());

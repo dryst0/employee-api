@@ -1,6 +1,7 @@
 package com.jfi.api.employee.usecase;
 
 import com.jfi.api.employee.domain.Employee;
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import com.jfi.api.employee.domain.InvalidEmployeeException;
 import com.jfi.api.employee.port.in.EmployeeService;
 import com.jfi.api.employee.port.out.EmployeePersistence;
@@ -34,6 +35,20 @@ public class EmployeeServiceImpl implements EmployeeService {
             validateEmployee(employee);
             return employeePersistence.saveEmployee(employee);
         });
+    }
+
+    @Override
+    public Mono<Employee> updateEmployee(UUID uuid, Employee employee) {
+        return employeePersistence
+            .getEmployeeById(uuid)
+            .switchIfEmpty(Mono.error(new EmployeeNotFoundException(uuid)))
+            .flatMap(existing ->
+                Mono.defer(() -> {
+                    validateEmployee(employee);
+                    employee.setUuid(uuid);
+                    return employeePersistence.saveEmployee(employee);
+                })
+            );
     }
 
     private void validateEmployee(Employee employee) {

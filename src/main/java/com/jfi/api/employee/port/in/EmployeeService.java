@@ -11,4 +11,6 @@ public interface EmployeeService {
     Mono<Employee> findEmployeeById(UUID uuid);
 
     Mono<Employee> createEmployee(Employee employee);
+
+    Mono<Employee> updateEmployee(UUID uuid, Employee employee);
 }
