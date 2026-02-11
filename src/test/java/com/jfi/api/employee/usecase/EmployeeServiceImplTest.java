@@ -2,6 +2,7 @@ package com.jfi.api.employee.usecase;
 
 import com.jfi.api.employee.adapter.out.persistence.FakeEmployeePersistence;
 import com.jfi.api.employee.domain.Employee;
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import com.jfi.api.employee.domain.EmployeeType;
 import com.jfi.api.employee.domain.InvalidEmployeeException;
 import java.util.UUID;
@@ -180,6 +181,33 @@ class EmployeeServiceImplTest {
         // when / then
         StepVerifier.create(employeeService.patchEmployee(existingId, patch))
             .expectError(InvalidEmployeeException.class)
+            .verify();
+    }
+
+    @Test
+    void givenExistingEmployee_whenDelete_thenEmployeeIsRemoved() {
+        // given
+        UUID existingId = workerEntity.getUuid();
+
+        // when
+        StepVerifier.create(
+            employeeService.deleteEmployee(existingId)
+        ).verifyComplete();
+
+        // then
+        StepVerifier.create(
+            employeeService.findEmployeeById(existingId)
+        ).verifyComplete();
+    }
+
+    @Test
+    void givenNonExistentEmployee_whenDelete_thenReportsNotFound() {
+        // given
+        UUID unknownId = UUID.randomUUID();
+
+        // when / then
+        StepVerifier.create(employeeService.deleteEmployee(unknownId))
+            .expectError(EmployeeNotFoundException.class)
             .verify();
     }
 

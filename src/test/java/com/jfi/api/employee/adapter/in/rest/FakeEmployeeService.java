@@ -56,6 +56,15 @@ public class FakeEmployeeService implements EmployeeService {
     }
 
     @Override
+    public Mono<Void> deleteEmployee(UUID uuid) {
+        if (!employees.containsKey(uuid)) {
+            return Mono.error(new EmployeeNotFoundException(uuid));
+        }
+        employees.remove(uuid);
+        return Mono.empty();
+    }
+
+    @Override
     public Mono<Employee> createEmployee(Employee employee) {
         if (employee.getUuid() == null) {
             employee.setUuid(UUID.randomUUID());

@@ -15,4 +15,6 @@ public interface EmployeeService {
     Mono<Employee> updateEmployee(UUID uuid, Employee employee);
 
     Mono<Employee> patchEmployee(UUID uuid, Employee employee);
+
+    Mono<Void> deleteEmployee(UUID uuid);
 }

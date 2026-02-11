@@ -65,6 +65,14 @@ public class EmployeeServiceImpl implements EmployeeService {
             );
     }
 
+    @Override
+    public Mono<Void> deleteEmployee(UUID uuid) {
+        return employeePersistence
+            .getEmployeeById(uuid)
+            .switchIfEmpty(Mono.error(new EmployeeNotFoundException(uuid)))
+            .flatMap(existing -> employeePersistence.deleteEmployee(uuid));
+    }
+
     private void applyPatch(Employee existing, Employee patch) {
         if (patch.getFirstName() != null) {
             existing.setFirstName(patch.getFirstName());
