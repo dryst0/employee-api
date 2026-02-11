@@ -49,7 +49,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenEmployeeId_whenFindById_thenProvidesTheEmployee() {
+    void givenEmployeeId_whenEmployeeIsLookedUp_thenProvidesTheEmployee() {
         // given
         UUID workerId = workerEntity.getUuid();
 
