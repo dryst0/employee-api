@@ -87,7 +87,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenCreate_thenRejects() {
+    void givenBlankFirstName_whenEmployeeIsAdded_thenRejects() {
         // given
         Employee invalid = Employee.builder()
             .firstName("  ")
