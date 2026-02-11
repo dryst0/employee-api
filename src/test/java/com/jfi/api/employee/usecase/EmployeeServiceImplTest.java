@@ -102,7 +102,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenNullEmployeeType_whenCreate_thenRejects() {
+    void givenThatEmployeeTypeIsNotProvided_whenEmployeeIsAdded_thenRejects() {
         // given
         Employee invalid = Employee.builder()
             .firstName("Pedro")
