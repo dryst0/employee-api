@@ -38,7 +38,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenEmployeesExist_whenGetAllEmployees_thenReturnAllDTOs() {
+    void givenEmployeesExist_whenGetAllEmployees_thenReturnAllEmployees() {
         // when / then
         StepVerifier.create(controller.getAllEmployees())
             .expectNextMatches(
@@ -55,7 +55,7 @@ class EmployeeRESTControllerTest {
     }
 
     @Test
-    void givenEmployeeExists_whenGetById_thenReturnDTO() {
+    void givenEmployeeExists_whenGetById_thenReturnEmployee() {
         // given
         UUID workerId = worker.getUuid();
 
