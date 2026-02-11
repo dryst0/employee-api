@@ -14,7 +14,7 @@ class EmployeeExceptionHandlerTest {
     EmployeeExceptionHandler handler = new EmployeeExceptionHandler();
 
     @Test
-    void givenEmployeeNotFound_whenHandled_thenEmployeeIsNotFound() {
+    void givenTheEmployeeIsNotStored_whenHandled_thenEmployeeIsNotFound() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -29,7 +29,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenEmployeeNotFound_whenHandled_thenDescribesTheProblem() {
+    void givenTheEmployeeIsNotStored_whenHandled_thenDescribesTheProblem() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -47,7 +47,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenEmployeeNotFound_whenHandled_thenIdentifiesTheMissingEmployee() {
+    void givenTheEmployeeIsNotStored_whenHandled_thenIdentifiesTheMissingEmployee() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
@@ -110,7 +110,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenEmployeeNotFound_whenHandled_thenDescribesGenericProblem() {
+    void givenTheEmployeeIsNotStored_whenHandled_thenDescribesGenericProblem() {
         // given
         UUID uuid = UUID.randomUUID();
         EmployeeNotFoundException exception = new EmployeeNotFoundException(
