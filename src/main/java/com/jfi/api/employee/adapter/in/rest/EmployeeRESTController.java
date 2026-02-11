@@ -1,5 +1,6 @@
 package com.jfi.api.employee.adapter.in.rest;
 
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import com.jfi.api.employee.port.in.EmployeeService;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;

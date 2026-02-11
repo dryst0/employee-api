@@ -1,5 +1,6 @@
 package com.jfi.api.employee.adapter.in.rest;
 
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import java.net.URI;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;

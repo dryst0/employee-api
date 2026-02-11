@@ -2,6 +2,7 @@ package com.jfi.api.employee.adapter.in.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

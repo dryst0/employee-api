@@ -1,6 +1,7 @@
 package com.jfi.api.employee.adapter.in.rest;
 
 import com.jfi.api.employee.domain.Employee;
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import com.jfi.api.employee.domain.EmployeeType;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
