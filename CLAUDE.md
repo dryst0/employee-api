@@ -6,6 +6,57 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Plan before executing**: Always explore the codebase and present a plan for approval before making any code changes. Never edit files immediately. Understand the scope, identify affected files, and agree on the approach first.
 
+## Memory Server Integration
+
+Claude has access to a persistent Memory Server knowledge graph containing user preferences, project context, and technology patterns. At the start of each session:
+
+1. **Load user preferences**: `mcp__memory__open_nodes(["Franz"])` to retrieve workflow preferences, design principles, and practices that Franz follows across all projects.
+2. **Load project context**: `mcp__memory__open_nodes(["Employee API"])` to retrieve the tech stack, architectural patterns, and project-specific decisions.
+3. **Query for technology-specific guidance**: When working with a specific technology (e.g., Spring Data R2DBC, Testcontainers, Flyway), use `mcp__memory__search_nodes("technology name")` to retrieve gotchas, patterns, and best practices.
+4. **Add learnings**: When discovering new patterns, gotchas, or decisions, update the relevant Memory Server entities using `mcp__memory__add_observations` so the knowledge persists across all future sessions.
+
+The Memory Server contains structured knowledge about:
+- **Franz** (person): Strict TDD, small green commits, Expand-Migrate-Contract enforcement, Object Calisthenics, SOLID principles, BDD with domain language
+- **Employee API** (project): Spring Boot 3.5 + Java 25, WebFlux + R2DBC, Hexagonal Architecture, complete tech stack
+- **Technologies**: Spring Data R2DBC, Project Reactor, PostgreSQL, Flyway, Testcontainers, ArchUnit, Log4j2, and more
+- **Practices**: TDD, BDD, SOLID Principles, Object Calisthenics, Expand-Migrate-Contract, Rule of Three, Conventional Commits
+- **Patterns**: Hexagonal Architecture with dependency rules and package structure
+- **Standards**: RFC 7807 for HTTP Problem Details
+
+Use Memory Server queries proactively—don't wait to be asked. If you encounter a technology or practice question, search the knowledge graph first.
+
+## Tool Selection Strategy
+
+Claude has access to multiple tool sets for file operations. Use the right tool for each task:
+
+### ACP Tools (Default for Code Changes)
+Use `mcp__acp__Read`, `mcp__acp__Write`, `mcp__acp__Edit`, `mcp__acp__Bash` for:
+- **All code changes** - provides diff preview and approval workflow
+- **Git operations** - commits, pushes, branches, tags
+- **Build/test/run commands** - `./mvnw` operations
+- **Any operation requiring user review** - aligns with strict workflow (small green commits, plan-first approach)
+
+### Filesystem MCP Tools (Read-Only Exploration)
+Use `mcp__filesystem__*` tools for:
+- **Bulk file reads** - `read_multiple_files` for reading 5+ files in parallel
+- **Directory exploration** - `directory_tree`, `list_directory`, `list_directory_with_sizes`
+- **File metadata queries** - `get_file_info` for sizes, timestamps, permissions
+- **File search** - `search_files` with glob patterns (complement to Grep/Glob)
+- **Read-only operations** - when no changes will be made
+
+### Decision Rule
+Ask: "Will this operation change files or require approval?" 
+- **Yes** → Use ACP tools (diff preview + approval)
+- **No** (read-only exploration) → Use Filesystem MCP tools (faster, structured output)
+
+### Examples
+- Reading a single file to understand code: `mcp__acp__Read` (default, will be used for edits later)
+- Reading 10 test files to analyze patterns: `mcp__filesystem__read_multiple_files` (bulk read)
+- Editing a file: `mcp__acp__Edit` (requires review)
+- Exploring directory structure: `mcp__filesystem__directory_tree` (read-only)
+- Running tests: `mcp__acp__Bash` (command execution)
+- Checking file size/timestamp: `mcp__filesystem__get_file_info` (metadata query)
+
 ## Build & Run Commands
 
 ```bash
