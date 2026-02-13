@@ -8,7 +8,6 @@ import org.flywaydb.core.api.MigrationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.r2dbc.AutoConfigureDataR2dbc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -16,10 +15,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.r2dbc.core.DatabaseClient;
 
 @SpringBootTest
-@Import({
-    TestcontainersConfiguration.class,
-    FlywayBaselineOnMigrateIT.NoOpFlywayMigrationConfig.class,
-})
+@Import(
+    {
+        TestcontainersConfiguration.class,
+        FlywayBaselineOnMigrateIT.NoOpFlywayMigrationConfig.class,
+    }
+)
 class FlywayBaselineOnMigrateIT {
 
     @TestConfiguration
@@ -77,8 +78,8 @@ class FlywayBaselineOnMigrateIT {
         MigrationInfo[] applied = flyway.info().applied();
         assertThat(applied).anyMatch(
             migration ->
-                migration.getVersion().getVersion().equals("20260210190100")
-                    && migration.getState() == MigrationState.BASELINE
+                migration.getVersion().getVersion().equals("20260210190100") &&
+                migration.getState() == MigrationState.BASELINE
         );
     }
 
