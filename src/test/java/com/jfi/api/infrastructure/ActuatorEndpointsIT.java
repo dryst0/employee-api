@@ -41,4 +41,32 @@ class ActuatorEndpointsIT {
                 assert body.contains("components");
             });
     }
+
+    @Test
+    void givenDatabaseIsAvailable_whenHealthIsChecked_thenShowsDatabaseStatus() {
+        webTestClient
+            .get()
+            .uri("/actuator/health")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .value(body -> {
+                assert body.contains("r2dbc");
+            });
+    }
+
+    @Test
+    void givenDatabaseIsAvailable_whenMetricsAreScraped_thenExposesDatabasePoolMetrics() {
+        webTestClient
+            .get()
+            .uri("/actuator/prometheus")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .value(body -> {
+                assert body.contains("r2dbc_pool");
+            });
+    }
 }
