@@ -27,4 +27,18 @@ class ActuatorEndpointsIT {
                 assert body.contains("jvm_memory_used_bytes");
             });
     }
+
+    @Test
+    void givenApplicationIsRunning_whenHealthIsChecked_thenProvidesHealthDetails() {
+        webTestClient
+            .get()
+            .uri("/actuator/health")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .value(body -> {
+                assert body.contains("components");
+            });
+    }
 }
