@@ -71,6 +71,20 @@ class ActuatorEndpointsIT {
     }
 
     @Test
+    void givenApplicationIsRunning_whenMetricsAreScraped_thenProvidesHttpRequestMetrics() {
+        webTestClient
+            .get()
+            .uri("/actuator/prometheus")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .value(body -> {
+                assert body.contains("http_server_requests");
+            });
+    }
+
+    @Test
     void givenApplicationIsRunning_whenLivenessIsChecked_thenApplicationIsAlive() {
         webTestClient
             .get()
