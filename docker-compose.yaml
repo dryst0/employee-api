@@ -7,3 +7,10 @@ services:
       POSTGRES_DB: employee
       POSTGRES_USER: employee
       POSTGRES_PASSWORD: employee
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
