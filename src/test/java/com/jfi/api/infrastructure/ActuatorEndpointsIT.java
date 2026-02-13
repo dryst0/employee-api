@@ -69,4 +69,24 @@ class ActuatorEndpointsIT {
                 assert body.contains("r2dbc_pool");
             });
     }
+
+    @Test
+    void givenApplicationIsRunning_whenLivenessIsChecked_thenApplicationIsAlive() {
+        webTestClient
+            .get()
+            .uri("/actuator/health/liveness")
+            .exchange()
+            .expectStatus()
+            .isOk();
+    }
+
+    @Test
+    void givenApplicationIsRunning_whenReadinessIsChecked_thenApplicationIsReady() {
+        webTestClient
+            .get()
+            .uri("/actuator/health/readiness")
+            .exchange()
+            .expectStatus()
+            .isOk();
+    }
 }
