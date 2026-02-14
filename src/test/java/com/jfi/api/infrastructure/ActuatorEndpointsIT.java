@@ -162,6 +162,26 @@ class ActuatorEndpointsIT {
     }
 
     @Test
+    void givenEmployeeOperationIsInvoked_whenServiceHandlesRequest_thenServiceSpanIsCreated() {
+        webTestClient.get().uri("/employees").exchange().expectStatus().isOk();
+
+        webTestClient
+            .get()
+            .uri("/actuator/prometheus")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .value(body ->
+                assertTrue(
+                    body.contains("method_observed") &&
+                        body.contains("EmployeeServiceImpl"),
+                    "Expected observation metric for employee service layer"
+                )
+            );
+    }
+
+    @Test
     void givenRequestIsHandled_whenResponseIsLogged_thenTraceIdIsPresent() {
         CapturingAppender appender = CapturingAppender.attach(
             RequestLoggingFilter.class

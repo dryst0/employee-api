@@ -5,11 +5,13 @@ import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import com.jfi.api.employee.domain.InvalidEmployeeException;
 import com.jfi.api.employee.port.in.EmployeeService;
 import com.jfi.api.employee.port.out.EmployeePersistence;
+import io.micrometer.observation.annotation.Observed;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Observed(contextualName = "employee.service")
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
