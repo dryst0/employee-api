@@ -72,7 +72,7 @@ public class RequestLoggingFilter implements WebFilter {
                             duration
                         );
                     }
-                    MDC.clear();
+                    MDC.remove(RequestIdFilter.REQUEST_ID_KEY);
                 })
         );
     }

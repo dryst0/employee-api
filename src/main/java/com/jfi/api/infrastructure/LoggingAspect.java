@@ -72,7 +72,7 @@ public class LoggingAspect {
                 setMdc(ctx);
                 log.debug("Failed {} with error: {}", method, e.getMessage());
             })
-            .doFinally(s -> MDC.clear());
+            .doFinally(s -> MDC.remove(RequestIdFilter.REQUEST_ID_KEY));
     }
 
     private Flux<?> wrapFlux(Flux<?> flux, String method, ContextView ctx) {
@@ -85,7 +85,7 @@ public class LoggingAspect {
                 setMdc(ctx);
                 log.debug("Failed {} with error: {}", method, e.getMessage());
             })
-            .doFinally(s -> MDC.clear());
+            .doFinally(s -> MDC.remove(RequestIdFilter.REQUEST_ID_KEY));
     }
 
     private void setMdc(ContextView ctx) {

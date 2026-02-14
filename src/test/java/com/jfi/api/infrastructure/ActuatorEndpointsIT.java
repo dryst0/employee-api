@@ -1,8 +1,18 @@
 package com.jfi.api.infrastructure;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.jfi.api.employee.adapter.out.persistence.TestcontainersConfiguration;
+import java.util.List;
+import java.util.Map;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.config.Property;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -128,6 +138,61 @@ class ActuatorEndpointsIT {
                 "Expected io.micrometer.tracing.Tracer on classpath for distributed tracing",
                 e
             );
+        }
+    }
+
+    @Test
+    void givenRequestIsHandled_whenResponseIsLogged_thenTraceIdIsPresent() {
+        CapturingAppender appender = CapturingAppender.attach(
+            RequestLoggingFilter.class
+        );
+
+        webTestClient.get().uri("/employees").exchange();
+
+        List<Map<String, String>> mdcSnapshots = appender.getMdcSnapshots();
+        appender.detach();
+        assertFalse(mdcSnapshots.isEmpty(), "Expected at least one log event");
+        String traceId = mdcSnapshots.getFirst().get("traceId");
+        assertTrue(
+            traceId != null && !traceId.isBlank(),
+            "Expected non-empty traceId in MDC"
+        );
+    }
+
+    static class CapturingAppender extends AbstractAppender {
+
+        private final List<Map<String, String>> mdcSnapshots =
+            new java.util.ArrayList<>();
+        private LoggerConfig loggerConfig;
+
+        CapturingAppender() {
+            super("CapturingAppender", null, null, true, Property.EMPTY_ARRAY);
+        }
+
+        static CapturingAppender attach(Class<?> loggerClass) {
+            CapturingAppender appender = new CapturingAppender();
+            appender.start();
+            Logger logger = (Logger) LogManager.getLogger(loggerClass);
+            appender.loggerConfig = logger.get();
+            appender.loggerConfig.setLevel(Level.DEBUG);
+            appender.loggerConfig.addAppender(appender, Level.DEBUG, null);
+            logger.getContext().updateLoggers();
+            return appender;
+        }
+
+        void detach() {
+            loggerConfig.removeAppender("CapturingAppender");
+        }
+
+        @Override
+        public void append(LogEvent event) {
+            mdcSnapshots.add(
+                new java.util.HashMap<>(event.getContextData().toMap())
+            );
+        }
+
+        List<Map<String, String>> getMdcSnapshots() {
+            return mdcSnapshots;
         }
     }
 }

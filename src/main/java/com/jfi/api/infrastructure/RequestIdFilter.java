@@ -22,7 +22,7 @@ public class RequestIdFilter implements WebFilter {
         MDC.put(REQUEST_ID_KEY, requestId);
         return chain
             .filter(exchange)
-            .doFinally(s -> MDC.clear())
+            .doFinally(s -> MDC.remove(REQUEST_ID_KEY))
             .contextWrite(Context.of(REQUEST_ID_KEY, requestId));
     }
 }
