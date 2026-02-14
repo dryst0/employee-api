@@ -1,9 +1,12 @@
 package com.jfi.api.infrastructure;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.jfi.api.employee.adapter.out.persistence.TestcontainersConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -13,6 +16,9 @@ class ActuatorEndpointsIT {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Test
     void givenApplicationIsRunning_whenMetricsAreScraped_thenProvidesPrometheusMetrics() {
@@ -102,5 +108,26 @@ class ActuatorEndpointsIT {
             .exchange()
             .expectStatus()
             .isOk();
+    }
+
+    @Test
+    void givenApplicationIsRunning_whenTracingIsChecked_thenDistributedTracingIsAutoConfigured() {
+        try {
+            Class<?> tracerClass = Class.forName(
+                "io.micrometer.tracing.Tracer"
+            );
+            String[] tracerBeans = applicationContext.getBeanNamesForType(
+                tracerClass
+            );
+            assertTrue(
+                tracerBeans.length > 0,
+                "Expected a distributed tracing Tracer bean to be auto-configured"
+            );
+        } catch (ClassNotFoundException e) {
+            throw new AssertionError(
+                "Expected io.micrometer.tracing.Tracer on classpath for distributed tracing",
+                e
+            );
+        }
     }
 }
