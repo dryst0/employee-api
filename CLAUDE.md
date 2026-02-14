@@ -1,15 +1,22 @@
 # CLAUDE.md
 
-This file provides operational guidance to Claude Code for this repository. For knowledge about practices, patterns, technologies, and conventions, query the Memory Server.
+This file provides operational guidance to Claude Code for this repository.
+
+## Workflow
+
+- **Plan before executing**: Always explore the codebase and present a plan for approval before making any code changes. Never edit files immediately. Understand the scope, identify affected files, and agree on the approach first.
 
 ## Memory Server Integration
 
-At the start of each session:
+MEMORY.md contains a compact cache of practices and project context that is always in context. For detailed observations, gotchas, full rule sets, and cross-project knowledge, query the Memory Server.
 
-1. **Load user context**: `mcp__memory__open_nodes(["Franz"])` — retrieves all practices Franz follows (TDD, BDD, SOLID, Object Calisthenics, Expand-Migrate-Contract, etc.) via relations.
-2. **Load project context**: `mcp__memory__open_nodes(["Employee API"])` — retrieves project-specific decisions, package structure, and stack details.
-3. **Query technologies on demand**: When working with a specific technology, use `mcp__memory__search_nodes("technology name")` to retrieve gotchas and patterns.
-4. **Add learnings**: When discovering new patterns or gotchas, update the Memory Server with `mcp__memory__add_observations` so knowledge persists across sessions.
+### Session Bootstrap
+1. **Load user context**: `mcp__memory__open_nodes(["Franz"])` — full practice observations beyond the MEMORY.md summary
+2. **Load project context**: `mcp__memory__open_nodes(["Employee API"])` — project-specific decisions, stack details, and conventions
+
+### During Work
+3. **Query before coding**: Before implementing an approved plan, query MEMORY.md and Memory Server for relevant practices, technology gotchas, and patterns that apply to the work. Use `mcp__memory__search_nodes("technology name")` for specific technologies.
+4. **Keep knowledge current**: When discovering new patterns, gotchas, or decisions, update Memory Server with `mcp__memory__add_observations` AND update the MEMORY.md cache if it affects a core practice or project summary. Knowledge should grow with every session.
 
 Use Memory Server queries proactively — don't wait to be asked.
 
