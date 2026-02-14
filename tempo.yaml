@@ -10,6 +10,11 @@ distributor:
         http:
           endpoint: "0.0.0.0:4318"
 
+ingester:
+  lifecycler:
+    ring:
+      replication_factor: 1
+
 storage:
   trace:
     backend: local
