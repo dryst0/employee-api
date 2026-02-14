@@ -182,6 +182,26 @@ class ActuatorEndpointsIT {
     }
 
     @Test
+    void givenEmployeeOperationIsInvoked_whenDataIsAccessed_thenPersistenceSpanIsCreated() {
+        webTestClient.get().uri("/employees").exchange().expectStatus().isOk();
+
+        webTestClient
+            .get()
+            .uri("/actuator/prometheus")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .value(body ->
+                assertTrue(
+                    body.contains("method_observed") &&
+                        body.contains("EmployeePersistenceAdapter"),
+                    "Expected observation metric for employee persistence layer"
+                )
+            );
+    }
+
+    @Test
     void givenRequestIsHandled_whenResponseIsLogged_thenTraceIdIsPresent() {
         CapturingAppender appender = CapturingAppender.attach(
             RequestLoggingFilter.class

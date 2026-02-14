@@ -2,11 +2,13 @@ package com.jfi.api.employee.adapter.out.persistence;
 
 import com.jfi.api.employee.domain.Employee;
 import com.jfi.api.employee.port.out.EmployeePersistence;
+import io.micrometer.observation.annotation.Observed;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Observed(contextualName = "employee.persistence")
 @Component
 public class EmployeePersistenceAdapter implements EmployeePersistence {
 
