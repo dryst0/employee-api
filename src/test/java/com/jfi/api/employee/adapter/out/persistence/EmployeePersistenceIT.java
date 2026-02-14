@@ -104,7 +104,7 @@ class EmployeePersistenceIT {
     }
 
     @Test
-    void givenNoEmployee_whenEmployeeIsLookedUp_thenFindsNothing() {
+    void givenNoEmployee_whenEmployeeIsLookedUp_thenEmployeeIsNotFound() {
         StepVerifier.create(
             employeePersistence.getEmployeeById(UUID.randomUUID())
         ).verifyComplete();

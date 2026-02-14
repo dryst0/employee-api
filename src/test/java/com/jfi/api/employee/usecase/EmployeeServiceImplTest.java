@@ -87,7 +87,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenEmployeeIsAdded_thenEmployeeIsNotAdded() {
+    void givenFirstNameIsNotProvided_whenEmployeeIsAdded_thenEmployeeIsNotAdded() {
         // given
         Employee invalid = Employee.builder()
             .firstName("  ")
@@ -139,7 +139,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenEmployeeInformationIsChanged_thenEmployeeInformationIsNotChanged() {
+    void givenFirstNameIsNotProvided_whenEmployeeInformationIsChanged_thenEmployeeInformationIsNotChanged() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee invalid = Employee.builder()
@@ -173,7 +173,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenBlankFirstName_whenEmployeeIsChanged_thenEmployeeIsNotChanged() {
+    void givenFirstNameIsNotProvided_whenEmployeeIsChanged_thenEmployeeIsNotChanged() {
         // given
         UUID existingId = workerEntity.getUuid();
         Employee patch = Employee.builder().firstName("  ").build();
@@ -201,7 +201,7 @@ class EmployeeServiceImplTest {
     }
 
     @Test
-    void givenNonExistentEmployee_whenEmployeeIsRemoved_thenEmployeeIsNotFound() {
+    void givenEmployeeDoesNotExist_whenEmployeeIsRemoved_thenEmployeeIsNotFound() {
         // given
         UUID unknownId = UUID.randomUUID();
 

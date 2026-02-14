@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class EmployeePatchRequestTest {
 
     @Test
-    void givenOnlyFirstName_whenEmployeeIsAdded_thenOnlyFirstNameShouldBeChanged() {
+    void givenFirstNameIsProvided_whenEmployeeIsChanged_thenFirstNameIsUpdated() {
         // given
         EmployeePatchRequest request = new EmployeePatchRequest(
             "Maria",

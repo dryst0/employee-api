@@ -65,7 +65,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenTheProblemIsReported_thenEmployeeIsNotAdded() {
+    void givenIncorrectEmployeeInformation_whenTheProblemIsReported_thenEmployeeIsNotAdded() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
@@ -79,7 +79,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenTheProblemIsReported_thenDescribesTheProblem() {
+    void givenIncorrectEmployeeInformation_whenTheProblemIsReported_thenDescribesTheProblem() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
@@ -96,7 +96,7 @@ class EmployeeExceptionHandlerTest {
     }
 
     @Test
-    void givenInvalidEmployee_whenTheProblemIsReported_thenExplainsWhatIsWrong() {
+    void givenIncorrectEmployeeInformation_whenTheProblemIsReported_thenExplainsWhatIsWrong() {
         // given
         InvalidEmployeeException exception = new InvalidEmployeeException(
             "First name must not be blank"
