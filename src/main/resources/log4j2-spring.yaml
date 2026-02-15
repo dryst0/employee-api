@@ -4,7 +4,7 @@ Configuration:
   Properties:
     Property:
       name: LOG_PATTERN
-      value: "%d{ISO8601}{UTC} %-5p [%t] [requestId=%X{requestId}] [traceId=%X{traceId} spanId=%X{spanId}] %c{1.} - %m%n"
+      value: "%d{ISO8601}{UTC} %-5p [%t] [requestId=%X{requestId}] [traceId=%X{traceId}] [spanId=%X{spanId}] %c{1.} - %m%n"
 
   Appenders:
     Console:
