@@ -3,6 +3,7 @@ package com.jfi.api.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.jfi.api.employee.domain.EmployeeNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -211,6 +212,71 @@ class LoggingAspectTest {
             e ->
                 e.getLevel() == Level.INFO &&
                 e.getMessage().getFormattedMessage().contains("Executed")
+        );
+    }
+
+    @Test
+    void givenDomainException_whenOperationFails_thenLogsAtInfoLevel()
+        throws Throwable {
+        // given
+        CapturingAppender appender = CapturingAppender.attach();
+        UUID uuid = UUID.randomUUID();
+        ProceedingJoinPoint joinPoint = new FakeJoinPoint(
+            "deleteEmployee",
+            "EmployeeServiceImpl",
+            new Object[] { uuid },
+            Mono.error(new EmployeeNotFoundException(uuid))
+        );
+
+        // when
+        @SuppressWarnings("unchecked")
+        Mono<Void> mono = (Mono<Void>) loggingAspect.logAround(joinPoint);
+        StepVerifier.create(
+            mono.contextWrite(
+                Context.of(RequestIdFilter.REQUEST_ID_KEY, "test-id")
+            )
+        )
+            .expectError(EmployeeNotFoundException.class)
+            .verify();
+
+        // then
+        appender.detach();
+        assertThat(appender.getEvents()).anyMatch(
+            e ->
+                e.getLevel() == Level.INFO &&
+                e.getMessage().getFormattedMessage().contains("Failed")
+        );
+    }
+
+    @Test
+    void givenUnexpectedException_whenOperationFails_thenLogsAtErrorLevel()
+        throws Throwable {
+        // given
+        CapturingAppender appender = CapturingAppender.attach();
+        ProceedingJoinPoint joinPoint = new FakeJoinPoint(
+            "saveEmployee",
+            "EmployeePersistenceAdapter",
+            new Object[] {},
+            Mono.error(new RuntimeException("Connection pool exhausted"))
+        );
+
+        // when
+        @SuppressWarnings("unchecked")
+        Mono<Void> mono = (Mono<Void>) loggingAspect.logAround(joinPoint);
+        StepVerifier.create(
+            mono.contextWrite(
+                Context.of(RequestIdFilter.REQUEST_ID_KEY, "test-id")
+            )
+        )
+            .expectError(RuntimeException.class)
+            .verify();
+
+        // then
+        appender.detach();
+        assertThat(appender.getEvents()).anyMatch(
+            e ->
+                e.getLevel() == Level.ERROR &&
+                e.getMessage().getFormattedMessage().contains("Failed")
         );
     }
 

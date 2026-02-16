@@ -1,5 +1,6 @@
 package com.jfi.api.infrastructure;
 
+import com.jfi.api.employee.domain.EmployeeException;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -65,7 +66,7 @@ public class LoggingAspect {
             })
             .doOnError(e -> {
                 setMdc(ctx);
-                log.debug("Failed {} with error: {}", method, e.getMessage());
+                logError(method, e);
             })
             .doFinally(s -> MDC.remove(RequestIdFilter.REQUEST_ID_KEY));
     }
@@ -78,9 +79,17 @@ public class LoggingAspect {
             })
             .doOnError(e -> {
                 setMdc(ctx);
-                log.debug("Failed {} with error: {}", method, e.getMessage());
+                logError(method, e);
             })
             .doFinally(s -> MDC.remove(RequestIdFilter.REQUEST_ID_KEY));
+    }
+
+    private void logError(String method, Throwable error) {
+        if (error instanceof EmployeeException) {
+            log.info("Failed {} with error: {}", method, error.getMessage());
+        } else {
+            log.error("Failed {} with error: {}", method, error.getMessage());
+        }
     }
 
     private void setMdc(ContextView ctx) {
