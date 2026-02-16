@@ -1,8 +1,18 @@
 package com.jfi.api.infrastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.config.Property;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,6 +126,126 @@ class LoggingAspectTest {
 
         // then
         assertEquals("plain result", result);
+    }
+
+    @Test
+    void givenMonoMethod_whenCompleted_thenLogsAtInfoLevel() throws Throwable {
+        // given
+        CapturingAppender appender = CapturingAppender.attach();
+        ProceedingJoinPoint joinPoint = new FakeJoinPoint(
+            "createEmployee",
+            "EmployeeServiceImpl",
+            new Object[] {},
+            Mono.just("created")
+        );
+
+        // when
+        @SuppressWarnings("unchecked")
+        Mono<String> mono = (Mono<String>) loggingAspect.logAround(joinPoint);
+        StepVerifier.create(
+            mono.contextWrite(
+                Context.of(RequestIdFilter.REQUEST_ID_KEY, "test-id")
+            )
+        )
+            .expectNext("created")
+            .verifyComplete();
+
+        // then
+        appender.detach();
+        assertThat(appender.getEvents()).anyMatch(
+            e ->
+                e.getLevel() == Level.INFO &&
+                e.getMessage().getFormattedMessage().contains("Completed")
+        );
+    }
+
+    @Test
+    void givenFluxMethod_whenCompleted_thenLogsAtInfoLevel() throws Throwable {
+        // given
+        CapturingAppender appender = CapturingAppender.attach();
+        ProceedingJoinPoint joinPoint = new FakeJoinPoint(
+            "getAllEmployees",
+            "EmployeeRESTController",
+            new Object[] {},
+            Flux.just("a", "b")
+        );
+
+        // when
+        @SuppressWarnings("unchecked")
+        Flux<String> flux = (Flux<String>) loggingAspect.logAround(joinPoint);
+        StepVerifier.create(
+            flux.contextWrite(
+                Context.of(RequestIdFilter.REQUEST_ID_KEY, "test-id")
+            )
+        )
+            .expectNext("a", "b")
+            .verifyComplete();
+
+        // then
+        appender.detach();
+        assertThat(appender.getEvents()).anyMatch(
+            e ->
+                e.getLevel() == Level.INFO &&
+                e.getMessage().getFormattedMessage().contains("Completed")
+        );
+    }
+
+    @Test
+    void givenNonReactiveMethod_whenCompleted_thenLogsAtInfoLevel()
+        throws Throwable {
+        // given
+        CapturingAppender appender = CapturingAppender.attach();
+        ProceedingJoinPoint joinPoint = new FakeJoinPoint(
+            "someMethod",
+            "SomeClass",
+            new Object[] {},
+            "result"
+        );
+
+        // when
+        loggingAspect.logAround(joinPoint);
+
+        // then
+        appender.detach();
+        assertThat(appender.getEvents()).anyMatch(
+            e ->
+                e.getLevel() == Level.INFO &&
+                e.getMessage().getFormattedMessage().contains("Executed")
+        );
+    }
+
+    static class CapturingAppender extends AbstractAppender {
+
+        private final List<LogEvent> events = new ArrayList<>();
+        private LoggerConfig loggerConfig;
+
+        CapturingAppender() {
+            super("CapturingAppender", null, null, true, Property.EMPTY_ARRAY);
+        }
+
+        static CapturingAppender attach() {
+            CapturingAppender appender = new CapturingAppender();
+            appender.start();
+            Logger logger = (Logger) LogManager.getLogger(LoggingAspect.class);
+            appender.loggerConfig = logger.get();
+            appender.loggerConfig.setLevel(Level.DEBUG);
+            appender.loggerConfig.addAppender(appender, Level.DEBUG, null);
+            logger.getContext().updateLoggers();
+            return appender;
+        }
+
+        void detach() {
+            loggerConfig.removeAppender("CapturingAppender");
+        }
+
+        @Override
+        public void append(LogEvent event) {
+            events.add(event.toImmutable());
+        }
+
+        List<LogEvent> getEvents() {
+            return events;
+        }
     }
 
     static class FakeJoinPoint implements ProceedingJoinPoint {

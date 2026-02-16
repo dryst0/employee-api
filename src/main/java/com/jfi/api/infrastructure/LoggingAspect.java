@@ -53,12 +53,7 @@ public class LoggingAspect {
             });
         }
 
-        log.debug(
-            "Executed {} with args {} returning {}",
-            method,
-            args,
-            result
-        );
+        log.info("Executed {} with args {} returning {}", method, args, result);
         return result;
     }
 
@@ -66,7 +61,7 @@ public class LoggingAspect {
         return mono
             .doOnNext(r -> {
                 setMdc(ctx);
-                log.debug("Completed {} with result", method);
+                log.info("Completed {} with result", method);
             })
             .doOnError(e -> {
                 setMdc(ctx);
@@ -79,7 +74,7 @@ public class LoggingAspect {
         return flux
             .doOnComplete(() -> {
                 setMdc(ctx);
-                log.debug("Completed {}", method);
+                log.info("Completed {}", method);
             })
             .doOnError(e -> {
                 setMdc(ctx);
