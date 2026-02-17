@@ -1,0 +1,34 @@
+{
+  "name": "Employee API",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.gitconfig,target=/home/developer/.gitconfig,type=bind,readonly",
+    "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
+  ],
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "/ssh-agent"
+  },
+  "containerEnv": {
+    "TESTCONTAINERS_RYUK_DISABLED": "true",
+    "CLAUDE_CONFIG_DIR": "/home/developer/.claude"
+  },
+  "initializeCommand": ".devcontainer/init-shared-volumes.sh",
+  "postCreateCommand": "./mvnw dependency:go-offline -B && npm install -g @google/gemini-cli @github/copilot && [ -f ~/.claude/settings.json ] || echo '{\"defaultMode\":\"bypassPermissions\"}' > ~/.claude/settings.json",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "github.copilot"
+      ]
+    }
+  }
+}
