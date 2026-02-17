@@ -3,9 +3,9 @@ FROM eclipse-temurin:25-jdk AS system
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        git curl ca-certificates sudo \
-        iptables ipset iproute2 dnsutils aggregate \
-        postgresql-client \
+    git curl ca-certificates sudo jq \
+    iptables ipset iproute2 dnsutils aggregate \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Stage 2: Developer environment
