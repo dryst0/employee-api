@@ -22,6 +22,8 @@
   "containerEnv": {
     "TESTCONTAINERS_RYUK_DISABLED": "true",
     "CLAUDE_CONFIG_DIR": "/home/developer/.claude",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "GEMINI_TELEMETRY_ENABLED": "0",
   },
   "initializeCommand": ".devcontainer/init-shared-volumes.sh",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
