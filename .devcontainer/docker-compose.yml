@@ -1,48 +1,53 @@
 services:
-  devcontainer:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    volumes:
-      - ..:/workspace:cached
-      - maven-cache:/home/developer/.m2
-      - npm-cache:/home/developer/.npm
-      - docker-cache:/var/lib/docker
-      - claude-config:/home/developer/.claude
-      - gemini-config:/home/developer/.gemini
-      - copilot-config:/home/developer/.copilot
-      - mcp-memory:/home/developer/.mcp-memory
-      - command-history:/commandhistory
-    ports:
-      - "8080:8080"
-      - "3000:3000"
-      - "5432:5432"
-    command: sleep infinity
+    devcontainer:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        cap_add:
+            - NET_ADMIN
+            - NET_RAW
+        volumes:
+            - ..:/workspace:cached
+            - maven-cache:/home/developer/.m2
+            - npm-cache:/home/developer/.npm
+            - docker-cache:/var/lib/docker
+            - claude-config:/home/developer/.claude
+            - gemini-config:/home/developer/.gemini
+            - copilot-config:/home/developer/.copilot
+            - zed-data:/home/developer/.local/share/zed
+            - mcp-memory:/home/developer/.mcp-memory
+            - command-history:/commandhistory
+        ports:
+            - "8080:8080"
+            - "3000:3000"
+            - "5432:5432"
+        command: sleep infinity
 
 volumes:
-  # Shared across projects — dependency caches (same JARs, packages, images)
-  maven-cache:
-    external: true
-    name: shared-maven-cache
-  npm-cache:
-    external: true
-    name: shared-npm-cache
-  docker-cache:
-    external: true
-    name: shared-docker-cache
-  # Shared across projects — same developer identity regardless of project
-  claude-config:
-    external: true
-    name: shared-claude-config
-  gemini-config:
-    external: true
-    name: shared-gemini-config
-  copilot-config:
-    external: true
-    name: shared-copilot-config
-  # Per-project — project-specific context
-  mcp-memory:
-  command-history:
+    # Shared across projects — dependency caches (same JARs, packages, images)
+    maven-cache:
+        external: true
+        name: shared-maven-cache
+    npm-cache:
+        external: true
+        name: shared-npm-cache
+    docker-cache:
+        external: true
+        name: shared-docker-cache
+    # Shared across projects — same developer identity regardless of project
+    claude-config:
+        external: true
+        name: shared-claude-config
+    gemini-config:
+        external: true
+        name: shared-gemini-config
+    copilot-config:
+        external: true
+        name: shared-copilot-config
+    # Shared across projects — Zed agent adapters, extensions, language servers
+    zed-data:
+        external: true
+        name: shared-zed-data
+    # Per-project — project-specific context
+    mcp-memory:
+    command-history:

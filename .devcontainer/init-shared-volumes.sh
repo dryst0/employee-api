@@ -11,6 +11,7 @@ for volume in \
     shared-docker-cache \
     shared-claude-config \
     shared-gemini-config \
-    shared-copilot-config; do
+    shared-copilot-config \
+    shared-zed-data; do
     docker volume create "$volume" 2>/dev/null || true
 done
