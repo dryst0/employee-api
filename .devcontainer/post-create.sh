@@ -6,7 +6,7 @@ set -euo pipefail
 # Fix volume mount ownership — Docker named volumes may be root-owned
 # from prior sessions or devcontainer feature installs (which run as root).
 # Excludes /var/lib/docker (managed by docker-in-docker feature).
-mkdir -p /home/developer/.local/share/zed
+mkdir -p /home/developer/.local/share/zed /home/developer/.config/zed /home/developer/.claude
 sudo chown -R developer:developer \
     /home/developer/.m2 \
     /home/developer/.npm \
@@ -15,14 +15,15 @@ sudo chown -R developer:developer \
     /home/developer/.copilot \
     /home/developer/.local/share/zed \
     /home/developer/.mcp-memory \
+    /home/developer/.config/zed \
     /commandhistory
 
 # Java dependencies
 ./mvnw dependency:go-offline -B
 
 # Claude Code default settings — plan mode start + all tools pre-approved
-if [ ! -f ~/.claude/settings.json ]; then
-  cat > ~/.claude/settings.json << 'CLAUDEEOF'
+if [ ! -f /home/developer/.claude/settings.json ]; then
+  cat > /home/developer/.claude/settings.json << 'CLAUDEEOF'
 {
   "permissions": {
     "defaultMode": "plan",
@@ -47,40 +48,40 @@ CLAUDEEOF
 fi
 
 # Zed configuration (project-level, gitignored)
-mkdir -p /workspace/.zed
-cat > /workspace/.zed/settings.json << 'ZEDEOF'
+cat > /home/developer/.config/zed/settings.json << 'ZEDEOF'
 {
   "auto_install_extensions": {
     "java": true,
-    "toml": true,
-    "dockerfile": true,
-    "sql": true
+    "html": true
   },
   "agent_servers": {
-    "claude": {
-      "env": {
-        "CLAUDE_CODE_EXECUTABLE": "claude"
-      }
-    },
     "gemini": {
       "ignore_system_version": false
     }
   },
   "context_servers": {
     "filesystem": {
+      "enabled": true,
+      "remote": false,
       "command": "mcp-server-filesystem",
-      "args": ["/workspace"]
+      "args": ["/"]
     },
     "memory": {
+      "enabled": true,
+      "remote": false,
       "command": "mcp-server-memory",
       "args": [],
       "env": { "MEMORY_FILE_PATH": "/home/developer/.mcp-memory/memory.json" }
     },
     "git": {
+      "enabled": true,
+      "remote": false,
       "command": "mcp-server-git",
       "args": ["--repository", "/workspace"]
     },
     "fetch": {
+      "enabled": true,
+      "remote": false,
       "command": "mcp-server-fetch",
       "args": []
     }
