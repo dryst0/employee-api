@@ -2,7 +2,8 @@
 # Firewall initialization for devcontainer security.
 # Adapted from Anthropic's reference: https://github.com/anthropics/claude-code/blob/main/.devcontainer/init-firewall.sh
 #
-# Restricts outbound connections to whitelisted domains only.
+# Developer user (UID 1000) gets unrestricted HTTP/HTTPS for web research.
+# Root and system processes are restricted to whitelisted domains only.
 # Runs via postStartCommand on every container start.
 
 set -euo pipefail
@@ -123,7 +124,12 @@ iptables -P OUTPUT DROP
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-# Then allow only specific outbound traffic to allowed domains
+# Allow HTTP/HTTPS outbound for developer user (WebFetch + mcp-server-fetch research)
+DEVELOPER_UID=1000
+iptables -A OUTPUT -m owner --uid-owner "$DEVELOPER_UID" -p tcp --dport 443 -j ACCEPT
+iptables -A OUTPUT -m owner --uid-owner "$DEVELOPER_UID" -p tcp --dport 80 -j ACCEPT
+
+# Then allow only specific outbound traffic to allowed domains (root, system processes)
 iptables -A OUTPUT -m set --match-set allowed-domains dst -j ACCEPT
 
 # Explicitly REJECT all other outbound traffic for immediate feedback
@@ -131,17 +137,19 @@ iptables -A OUTPUT -j REJECT --reject-with icmp-admin-prohibited
 
 echo "Firewall configuration complete"
 echo "Verifying firewall rules..."
+
+# This script runs as root (via sudo), so these checks verify the whitelist for non-developer users.
+# Developer (UID 1000) has unrestricted HTTP/HTTPS for web research (WebFetch, mcp-server-fetch).
 if curl --connect-timeout 5 https://example.com >/dev/null 2>&1; then
-    echo "ERROR: Firewall verification failed - was able to reach https://example.com"
+    echo "ERROR: Firewall verification failed - root was able to reach https://example.com"
     exit 1
 else
-    echo "Firewall verification passed - unable to reach https://example.com as expected"
+    echo "Firewall verification passed - root unable to reach https://example.com as expected"
 fi
 
-# Verify GitHub API access
 if ! curl --connect-timeout 5 https://api.github.com/zen >/dev/null 2>&1; then
-    echo "ERROR: Firewall verification failed - unable to reach https://api.github.com"
+    echo "ERROR: Firewall verification failed - root unable to reach https://api.github.com"
     exit 1
 else
-    echo "Firewall verification passed - able to reach https://api.github.com as expected"
+    echo "Firewall verification passed - root able to reach https://api.github.com as expected"
 fi
