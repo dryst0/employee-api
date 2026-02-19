@@ -76,9 +76,9 @@ RUN sed -i '1s|^#!.*python.*|#!/usr/bin/env python3|' /opt/python-tools/bin/mcp-
 # ── Stage 3: Security hardening ──
 FROM developer AS devcontainer
 
-COPY init-firewall.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/init-firewall.sh \
-    && echo "developer ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/developer-firewall \
+COPY setup-firewall.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/setup-firewall.sh \
+    && echo "developer ALL=(root) NOPASSWD: /usr/local/bin/setup-firewall.sh" > /etc/sudoers.d/developer-firewall \
     && chmod 0440 /etc/sudoers.d/developer-firewall
 
 ENV DEVCONTAINER=true
