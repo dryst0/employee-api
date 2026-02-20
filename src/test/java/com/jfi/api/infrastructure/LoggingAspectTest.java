@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.jfi.api.employee.domain.EmployeeNotFoundException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LogEvent;
@@ -152,12 +154,12 @@ class LoggingAspectTest {
             .verifyComplete();
 
         // then
+        Predicate<LogEvent> completed = e ->
+            e.getLevel() == Level.INFO &&
+            e.getMessage().getFormattedMessage().contains("Completed");
+        appender.awaitEvent(completed, Duration.ofSeconds(2));
         appender.detach();
-        assertThat(appender.getEvents()).anyMatch(
-            e ->
-                e.getLevel() == Level.INFO &&
-                e.getMessage().getFormattedMessage().contains("Completed")
-        );
+        assertThat(appender.getEvents()).anyMatch(completed);
     }
 
     @Test
@@ -183,12 +185,12 @@ class LoggingAspectTest {
             .verifyComplete();
 
         // then
+        Predicate<LogEvent> completed = e ->
+            e.getLevel() == Level.INFO &&
+            e.getMessage().getFormattedMessage().contains("Completed");
+        appender.awaitEvent(completed, Duration.ofSeconds(2));
         appender.detach();
-        assertThat(appender.getEvents()).anyMatch(
-            e ->
-                e.getLevel() == Level.INFO &&
-                e.getMessage().getFormattedMessage().contains("Completed")
-        );
+        assertThat(appender.getEvents()).anyMatch(completed);
     }
 
     @Test
@@ -240,12 +242,12 @@ class LoggingAspectTest {
             .verify();
 
         // then
+        Predicate<LogEvent> failed = e ->
+            e.getLevel() == Level.INFO &&
+            e.getMessage().getFormattedMessage().contains("Failed");
+        appender.awaitEvent(failed, Duration.ofSeconds(2));
         appender.detach();
-        assertThat(appender.getEvents()).anyMatch(
-            e ->
-                e.getLevel() == Level.INFO &&
-                e.getMessage().getFormattedMessage().contains("Failed")
-        );
+        assertThat(appender.getEvents()).anyMatch(failed);
     }
 
     @Test
@@ -272,12 +274,12 @@ class LoggingAspectTest {
             .verify();
 
         // then
+        Predicate<LogEvent> failed = e ->
+            e.getLevel() == Level.ERROR &&
+            e.getMessage().getFormattedMessage().contains("Failed");
+        appender.awaitEvent(failed, Duration.ofSeconds(2));
         appender.detach();
-        assertThat(appender.getEvents()).anyMatch(
-            e ->
-                e.getLevel() == Level.ERROR &&
-                e.getMessage().getFormattedMessage().contains("Failed")
-        );
+        assertThat(appender.getEvents()).anyMatch(failed);
     }
 
     static class CapturingAppender extends AbstractAppender {
@@ -311,6 +313,17 @@ class LoggingAspectTest {
 
         List<LogEvent> getEvents() {
             return events;
+        }
+
+        void awaitEvent(Predicate<LogEvent> predicate, Duration timeout)
+            throws InterruptedException {
+            long deadline = System.nanoTime() + timeout.toNanos();
+            while (System.nanoTime() < deadline) {
+                if (events.stream().anyMatch(predicate)) {
+                    return;
+                }
+                Thread.sleep(10);
+            }
         }
     }
 

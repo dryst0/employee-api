@@ -3,6 +3,7 @@ package com.jfi.api.infrastructure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.Level;
@@ -26,7 +27,7 @@ class RequestLoggingFilterTest {
     RequestLoggingFilter filter = new RequestLoggingFilter();
 
     @Test
-    void givenSuccessfulRequest_thenLogsAtInfo() {
+    void givenSuccessfulRequest_thenLogsAtInfo() throws InterruptedException {
         // given
         MockServerHttpRequest request = MockServerHttpRequest.get(
             "/employees"
@@ -44,8 +45,9 @@ class RequestLoggingFilterTest {
             .verify();
 
         // then
-        List<String> messages = appender.getMessages();
+        appender.awaitMessages(1, Duration.ofSeconds(2));
         appender.detach();
+        List<String> messages = appender.getMessages();
         assertEquals(
             1,
             messages.size(),
@@ -60,7 +62,7 @@ class RequestLoggingFilterTest {
     }
 
     @Test
-    void givenClientError_thenLogsAtInfoWithReason() {
+    void givenClientError_thenLogsAtInfoWithReason() throws InterruptedException {
         // given
         MockServerHttpRequest request = MockServerHttpRequest.get(
             "/employees/bad"
@@ -79,8 +81,9 @@ class RequestLoggingFilterTest {
             .verify();
 
         // then
-        List<String> messages = appender.getMessages();
+        appender.awaitMessages(1, Duration.ofSeconds(2));
         appender.detach();
+        List<String> messages = appender.getMessages();
         assertEquals(
             1,
             messages.size(),
@@ -98,7 +101,7 @@ class RequestLoggingFilterTest {
     }
 
     @Test
-    void givenServerError_thenLogsAtError() {
+    void givenServerError_thenLogsAtError() throws InterruptedException {
         // given
         MockServerHttpRequest request = MockServerHttpRequest.get(
             "/employees"
@@ -117,8 +120,9 @@ class RequestLoggingFilterTest {
             .verify();
 
         // then
-        List<String> messages = appender.getMessages();
+        appender.awaitMessages(1, Duration.ofSeconds(2));
         appender.detach();
+        List<String> messages = appender.getMessages();
         assertEquals(
             1,
             messages.size(),
@@ -136,7 +140,7 @@ class RequestLoggingFilterTest {
     }
 
     @Test
-    void givenRequestWithContextId_thenMdcContainsRequestId() {
+    void givenRequestWithContextId_thenMdcContainsRequestId() throws InterruptedException {
         // given
         MockServerHttpRequest request = MockServerHttpRequest.get(
             "/employees"
@@ -163,8 +167,9 @@ class RequestLoggingFilterTest {
             .verify();
 
         // then
-        List<Map<String, String>> mdcSnapshots = appender.getMdcSnapshots();
+        appender.awaitMessages(1, Duration.ofSeconds(2));
         appender.detach();
+        List<Map<String, String>> mdcSnapshots = appender.getMdcSnapshots();
         assertEquals(1, mdcSnapshots.size());
         assertEquals(
             "test-request-id",
@@ -218,6 +223,17 @@ class RequestLoggingFilterTest {
 
         List<Map<String, String>> getMdcSnapshots() {
             return mdcSnapshots;
+        }
+
+        void awaitMessages(int count, Duration timeout)
+            throws InterruptedException {
+            long deadline = System.nanoTime() + timeout.toNanos();
+            while (System.nanoTime() < deadline) {
+                if (messages.size() >= count) {
+                    return;
+                }
+                Thread.sleep(10);
+            }
         }
     }
 }
