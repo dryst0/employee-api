@@ -1,120 +1,132 @@
 # Employee API
 
-A reactive REST microservice for managing employees, built with Spring Boot 3.5 and Java 25.
+A reactive RESTful API built with Spring Boot, created as a Kata to consolidate practices learned from weekly Katas at IONOS — TDD, hexagonal architecture, observability, and clean code disciplines applied end-to-end.
 
 ## Tech Stack
 
-- **Java 25** with **Spring Boot 3.5.10**
-- **Spring WebFlux** (Netty) — non-blocking reactive HTTP
-- **R2DBC** — reactive database access
-- **Project Reactor** — `Mono<T>` / `Flux<T>` reactive types
-- **SpringDoc OpenAPI 2.8** — auto-generated Swagger UI
-- **Log4j2 + LMAX Disruptor** — async logging
-- **Spring Boot Actuator** — health and metrics endpoints
-- **Lombok** — boilerplate reduction for domain entities
-- **ArchUnit** — architecture rule enforcement
+- Java 25, Spring Boot 3.5, Spring WebFlux, Spring Data R2DBC
+- PostgreSQL 17.8, Flyway migrations
+- Maven 3.9.12, Spring Boot Buildpacks (Paketo)
+- Log4j2, Micrometer Tracing, OpenTelemetry, Prometheus, Grafana, Tempo
+
+## Architecture
+
+Hexagonal Architecture (Ports & Adapters), enforced by [ArchUnit tests](src/test/java/com/jfi/api/ApplicationTest.java).
+
+```
+com.jfi.api.employee/
+├── domain/                          # Domain model
+├── port/in/                         # Driving ports
+├── port/out/                        # Driven ports
+├── usecase/                         # Use case implementations
+└── adapter/
+    ├── in/rest/                     # REST adapter
+    └── out/persistence/             # Persistence adapter
+
+com.jfi.api.infrastructure/          # Cross-cutting concerns
+```
+
+See [Architecture diagram](docs/architecture.md) for the full component view and dependency rules.
 
 ## Getting Started
 
-### Prerequisites
-
-- Java 25+
-- Maven 3.9+ (or use the included Maven wrapper)
-
-### Build
+**Prerequisites:** Java 25, Docker (for PostgreSQL and observability stack)
 
 ```bash
-./mvnw clean package
-```
-
-### Run
-
-```bash
+# Run application (starts Netty on port 8080, auto-starts PostgreSQL via Docker Compose)
 ./mvnw spring-boot:run
-```
 
-The application starts on **http://localhost:8080**.
-
-### Test
-
-```bash
 # Run all tests
 ./mvnw test
 
 # Run a single test class
-./mvnw test -Dtest=EmployeeServiceImplTests
+./mvnw test -Dtest=EmployeeServiceImplTest
 
-# Run a single test method
-./mvnw test -Dtest=EmployeeServiceImplTests#testMethodName
-```
+# Build
+./mvnw clean package
 
-## API
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/employees` | List all employees |
-| GET | `/employees/{uuid}` | Get employee by ID |
-
-Error responses use RFC 7807 Problem Detail format (e.g., 404 when employee not found).
-
-### API Documentation
-
-Swagger UI is available at **http://localhost:8080/swagger-ui.html** when the application is running.
-
-To generate the OpenAPI spec as a build artifact:
-
-```bash
-./mvnw verify
-```
-
-## Architecture
-
-The project follows **Hexagonal Architecture** (Ports & Adapters), organized by domain:
-
-```
-com.jfi.api
-├── Application.java
-└── employee
-    ├── domain/                          # Domain models (Employee, EmployeeType)
-    ├── port/
-    │   ├── in/                          # Driving ports (EmployeeService)
-    │   └── out/                         # Driven ports (EmployeeRepository)
-    ├── usecase/                         # Use case implementations (EmployeeServiceImpl)
-    └── adapter/
-        ├── in/rest/                     # REST controller, DTOs, error handling
-        └── out/persistence/             # Repository implementations
-```
-
-Dependencies always point inward: **adapters → ports/use cases → domain**. This is enforced at build time by ArchUnit tests.
-
-## Testing
-
-Tests follow TDD (Red-Green-Refactor) and BDD conventions (given/when/then), preferring **fakes over mocks** for collaborators the project owns:
-
-- **Unit tests** — Fakes + StepVerifier for reactive assertions
-- **Architecture tests** — ArchUnit enforces hexagonal dependency rules
-- **DTO tests** — validates record contracts and domain-to-DTO mapping
-
-## Container
-
-Build the container image using Spring Boot Buildpacks (no Dockerfile needed):
-
-```bash
+# Build container image
 ./mvnw spring-boot:build-image
 ```
 
-Run the container:
+## CI/CD
+
+GitHub Actions pipeline triggered on every push to `main`. Builds, tests, packages an OCI image, and pushes it to `ghcr.io/dryst0/employee-api`.
+
+Each build is tagged with a traceable version: `<UTC timestamp>-<workflow run ID>-<short commit SHA>`. This version flows through the JAR manifest, image tag, and OCI metadata labels.
+
+See [CI pipeline diagram](docs/ci-pipeline.md) for the full workflow.
+
+## Observability
+
+Three-pillar observability: structured logging (Log4j2 + MDC), metrics (Prometheus + Grafana), and distributed tracing (Micrometer Tracing + OTel → Tempo).
+
+Every request is correlated with `requestId`, `traceId`, and `spanId` across the reactive chain. Sampling and log levels are profile-aware (dev/staging/prod).
+
+See [Observability diagram](docs/observability.md) for the full stack view and profile configuration.
+
+## API Documentation
+
+With the application running:
+
+- **Swagger UI:** http://localhost:8080/webjars/swagger-ui/index.html
+- **OpenAPI spec:** http://localhost:8080/v3/api-docs
+
+Generate the OpenAPI spec as a file:
 
 ```bash
-docker run -p 8080:8080 ghcr.io/dryst0/employee-api:0.0.1-SNAPSHOT
+./mvnw verify
+# Output: target/openapi.json
 ```
 
-Push to GitHub Container Registry:
+## Lessons Learned
 
-```bash
-docker push ghcr.io/dryst0/employee-api:0.0.1-SNAPSHOT
-```
+Gotchas and insights from building this API.
 
-## License
+### WebFlux is overkill for CRUD
 
-This project is for demonstration purposes.
+Spring WebFlux adds significant complexity (reactive types everywhere, context propagation gotchas, MDC workarounds, reactive test utilities) with no real benefit for standard request/response workloads. Spring MVC with virtual threads would have been the pragmatic choice. WebFlux is justified only for streaming use cases — SSE, WebSockets, change streams, or backpressure-sensitive pipelines.
+
+### Reactive context propagation is not automatic
+
+`spring.reactor.context-propagation=auto` must be set explicitly. Without it, `traceId` and `spanId` are not auto-populated into MDC, and log correlation silently breaks. Every reactive operator that needs MDC access must use `Mono.deferContextual()`.
+
+### Log4j2 requires a global Logback exclusion
+
+Excluding `spring-boot-starter-logging` from a single starter is fragile — Maven resolution order determines which starter pulls Logback first. The reliable approach is to declare the bare `spring-boot-starter` with the exclusion, which globally prevents Logback from leaking through any other starter.
+
+### Never use `MDC.clear()` in reactive code
+
+`MDC.clear()` wipes auto-propagated values like `traceId` and `spanId` from context propagation. Use `MDC.remove(key)` for owned keys only.
+
+### Flyway needs JDBC even in an R2DBC stack
+
+Flyway does not support R2DBC. Add the JDBC driver (`org.postgresql:postgresql`) alongside `r2dbc-postgresql`. Spring Boot auto-configures a separate JDBC DataSource for Flyway while the application uses R2DBC.
+
+### Testcontainers R2DBC module is easy to forget
+
+`org.testcontainers:r2dbc` is required in addition to `org.testcontainers:postgresql` for `@ServiceConnection` to wire the R2DBC `ConnectionFactory`. Without it, the test container starts but the application can't connect.
+
+### Testcontainers Ryuk is broken on macOS Docker Desktop
+
+TCP FIN signals don't reach the Ryuk container inside the VM, so containers are never cleaned up. Use Spring Boot's `@TestConfiguration` + `@Bean` + `@ServiceConnection` instead of JUnit's `@Testcontainers`/`@Container` — Spring's lifecycle post-processor calls `container.close()` directly.
+
+### Don't name adapters `*RepositoryImpl`
+
+Spring Data's `*Impl` convention clashes with custom repository implementations. Name outbound adapters `*Adapter` with `@Component` instead of `@Repository`.
+
+### Framework-rejected requests bypass controllers
+
+Requests rejected by the framework (405 Method Not Allowed, unmapped 404s) never reach `@RestController` methods or `@ControllerAdvice`. Only a `WebFilter` sees them — this is why `RequestLoggingFilter` exists at the filter level.
+
+### Grafana Tempo must be pinned for local dev
+
+Tempo v2.10+ defaults to a Kafka-based ingest path, causing `InstancesCount <= 0` errors in single-binary mode. Pin to 2.6.1 and set `ingester.lifecycler.ring.replication_factor=1` for single-instance deployments.
+
+### Paketo CDS is broken on Java 25
+
+The AOT cache step exits with code 1 despite success. Disabled via `BP_JVM_CDS_ENABLED=false` until [paketo-buildpacks/spring-boot#581](https://github.com/paketo-buildpacks/spring-boot/issues/581) is resolved.
+
+### Flyway does not support PostgreSQL 18
+
+Flyway 11.7.2 (managed by Spring Boot 3.5) warns that PostgreSQL 18 is untested. Pinned to PostgreSQL 17.8 — keep docker-compose and Testcontainers config in sync since they are coupled.
