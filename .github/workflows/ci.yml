@@ -3,6 +3,16 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'pom.xml'
+      - '.mvn/**'
+      - 'mvnw'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
