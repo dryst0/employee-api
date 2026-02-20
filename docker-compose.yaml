@@ -1,6 +1,7 @@
 services:
   postgres:
-    image: postgres:17
+    # Flyway 11.7.2 (managed by Spring Boot) does not officially support PostgreSQL 18
+    image: postgres:17.8
     ports:
       - "5432:5432"
     environment:
