@@ -1,23 +1,48 @@
 # CI Pipeline
 
-GitHub Actions workflow triggered on every push to `main`.
+GitHub Actions workflow with two jobs, triggered on push to `main` and pull requests targeting `main`. Only runs when source, build, or workflow files change.
 
 ```mermaid
 flowchart TD
-    PUSH[Push to main] --> CHECKOUT[Checkout]
-    CHECKOUT --> JAVA[Set up Java 25<br/>Temurin + Maven cache]
-    JAVA --> VERSION[Generate build version<br/>YYYYMMDDTHHmmss-runId-sha]
-    VERSION --> BUILD[Build and test<br/>mvnw clean package<br/>-Drevision=version]
-    BUILD --> REPORTS[Upload test reports<br/>surefire-reports, 7 days]
-    BUILD --> LOGIN[Log in to ghcr.io<br/>GITHUB_TOKEN]
-    LOGIN --> IMAGE[Build OCI image<br/>Paketo Buildpacks<br/>+ OCI metadata labels]
-    IMAGE --> PUSH_IMG[Push to<br/>ghcr.io/dryst0/employee-api:version]
+    TRIGGER{Push to main<br/>or Pull Request} --> TEST_JOB
 
-    style PUSH fill:#e3f2fd,stroke:#1565c0
-    style BUILD fill:#fff3e0,stroke:#e65100
-    style IMAGE fill:#fce4ec,stroke:#c62828
-    style PUSH_IMG fill:#e8f5e9,stroke:#2e7d32
+    subgraph TEST_JOB [Test Job]
+        CHECKOUT_T[Checkout] --> JAVA_T[Set up Java 25<br/>Temurin + Maven cache]
+        JAVA_T --> VERSION[Generate build version<br/>timestamp-runId-sha]
+        VERSION --> BUILD[Build and test<br/>mvnw clean package]
+        BUILD --> REPORTS[Upload test reports<br/>surefire-reports, 7 days]
+    end
+
+    TEST_JOB --> GATE{Push only?}
+    GATE -- Yes --> PUBLISH_JOB
+    GATE -- No / PR --> SKIP[Publish skipped]
+
+    subgraph PUBLISH_JOB [Publish Job]
+        CHECKOUT_P[Checkout] --> JAVA_P[Set up Java 25<br/>Temurin + Maven cache]
+        JAVA_P --> LOGIN[Log in to ghcr.io]
+        LOGIN --> IMAGE[Build and push OCI image<br/>Paketo Buildpacks<br/>+ OCI metadata labels]
+    end
+
+    style TRIGGER fill:#e3f2fd,stroke:#1565c0
+    style TEST_JOB fill:#fff3e0,stroke:#e65100
+    style PUBLISH_JOB fill:#fce4ec,stroke:#c62828
+    style GATE fill:#f3e5f5,stroke:#6a1b9a
+    style SKIP fill:#eceff1,stroke:#607d8b
 ```
+
+## Triggers
+
+| Event | Branches | Path filters |
+|-------|----------|-------------|
+| `push` | `main` | `src/**`, `pom.xml`, `.mvn/**`, `mvnw`, `.github/workflows/ci.yml` |
+| `pull_request` | `main` | Same as push |
+
+## Concurrency
+
+One run at a time per branch or PR. New pushes cancel in-progress runs.
+
+- Push runs: grouped by `refs/heads/main`
+- PR runs: grouped by PR number (won't cancel main branch runs)
 
 ## Version Pattern
 
@@ -42,3 +67,8 @@ This version flows through:
 | `org.opencontainers.image.source` | Repository URL |
 | `org.opencontainers.image.revision` | Full commit SHA (40 chars) |
 | `org.opencontainers.image.created` | RFC 3339 build timestamp |
+
+## Supply Chain Security
+
+- All GitHub Actions pinned to full commit SHAs (not version tags)
+- [Dependabot](../.github/dependabot.yml) updates Maven and GitHub Actions dependencies weekly, grouped into one PR per ecosystem
