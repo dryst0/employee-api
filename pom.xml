@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.11</version>
+		<version>4.0.3</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.jfi</groupId>
@@ -21,7 +21,7 @@
 		<java.version>25</java.version>
 		<revision>local</revision>
 		<disruptor.version>4.0.0</disruptor.version>
-		<springdoc.version>2.8.15</springdoc.version>
+		<springdoc.version>3.0.1</springdoc.version>
 		<archunit.version>1.4.1</archunit.version>
 		<google.bean-matcher.version>0.14</google.bean-matcher.version>
 		<lombok.version>1.18.42</lombok.version>
