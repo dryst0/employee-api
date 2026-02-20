@@ -2,6 +2,8 @@
 
 A reactive RESTful API built with Spring Boot, created as a Kata to consolidate practices learned from weekly Katas at IONOS — TDD, hexagonal architecture, observability, and clean code disciplines applied end-to-end.
 
+Built through modern pair programming: an AI agent drives (writes the code) while the human navigates (steers direction, reviews decisions, and enforces quality).
+
 ## Tech Stack
 
 - Java 25, Spring Boot 3.5, Spring WebFlux, Spring Data R2DBC
