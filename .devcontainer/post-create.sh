@@ -21,7 +21,8 @@ sudo chown -R developer:developer \
 # Java dependencies
 ./mvnw dependency:go-offline -B
 
-# Claude Code default settings — plan mode start + all tools pre-approved
+# Claude Code default settings — full access with credential deny rules,
+# plus MCP servers so the ACP adapter (Zed agent panel) discovers them.
 if [ ! -f /home/developer/.claude/settings.json ]; then
   cat > /home/developer/.claude/settings.json << 'CLAUDEEOF'
 {
@@ -41,7 +42,42 @@ if [ ! -f /home/developer/.claude/settings.json ]; then
       "TodoWrite",
       "NotebookEdit",
       "mcp__*"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.envrc)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Edit(./.envrc)",
+      "Write(./.env)",
+      "Write(./.env.*)",
+      "Write(./.envrc)",
+      "Read(~/.claude.json)",
+      "Read(~/.ssh/**)",
+      "Read(~/.gitconfig)"
     ]
+  },
+  "mcpServers": {
+    "filesystem": {
+      "command": "mcp-server-filesystem",
+      "args": ["/"]
+    },
+    "memory": {
+      "command": "mcp-server-memory",
+      "args": [],
+      "env": {
+        "MEMORY_FILE_PATH": "/home/developer/.mcp-memory/mcp_memory.json"
+      }
+    },
+    "git": {
+      "command": "mcp-server-git",
+      "args": ["--repository", "/workspace"]
+    },
+    "fetch": {
+      "command": "mcp-server-fetch",
+      "args": []
+    }
   }
 }
 CLAUDEEOF
@@ -57,33 +93,6 @@ cat > /home/developer/.config/zed/settings.json << 'ZEDEOF'
   "agent_servers": {
     "gemini": {
       "ignore_system_version": false
-    }
-  },
-  "context_servers": {
-    "filesystem": {
-      "enabled": true,
-      "remote": false,
-      "command": "mcp-server-filesystem",
-      "args": ["/"]
-    },
-    "memory": {
-      "enabled": true,
-      "remote": false,
-      "command": "mcp-server-memory",
-      "args": [],
-      "env": { "MEMORY_FILE_PATH": "/home/developer/.mcp-memory/memory.json" }
-    },
-    "git": {
-      "enabled": true,
-      "remote": false,
-      "command": "mcp-server-git",
-      "args": ["--repository", "/workspace"]
-    },
-    "fetch": {
-      "enabled": true,
-      "remote": false,
-      "command": "mcp-server-fetch",
-      "args": []
     }
   }
 }
