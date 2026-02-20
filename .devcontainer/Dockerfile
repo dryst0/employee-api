@@ -1,5 +1,9 @@
 # ── Builder: Node.js tools ──
 FROM node:22-slim AS node-tools
+ARG CLAUDE_AGENT_ACP_VERSION=0.18.0
+ARG JSON_LANGSERVER_VERSION=4.10.0
+ARG YAML_LANGSERVER_VERSION=1.20.0
+ARG PRETTIER_VERSION=3.8.1
 ENV NPM_CONFIG_PREFIX=/opt/node-tools
 RUN npm install -g \
     @google/gemini-cli \
@@ -8,26 +12,27 @@ RUN npm install -g \
 
 # Pre-install Zed runtime dependencies so first launch is instant.
 # Claude agent ACP adapter
-RUN mkdir -p /opt/zed-data/external_agents/claude-agent-acp/0.17.1 \
-    && cd /opt/zed-data/external_agents/claude-agent-acp/0.17.1 \
-    && echo '{"dependencies":{"@zed-industries/claude-agent-acp":"0.17.1"}}' > package.json \
+RUN mkdir -p /opt/zed-data/external_agents/claude-agent-acp/${CLAUDE_AGENT_ACP_VERSION} \
+    && cd /opt/zed-data/external_agents/claude-agent-acp/${CLAUDE_AGENT_ACP_VERSION} \
+    && echo "{\"dependencies\":{\"@zed-industries/claude-agent-acp\":\"${CLAUDE_AGENT_ACP_VERSION}\"}}" > package.json \
     && npm install --no-fund --no-audit
 # Language servers (JSON, YAML) and Prettier
 RUN mkdir -p /opt/zed-data/languages/json-language-server \
     && cd /opt/zed-data/languages/json-language-server \
-    && echo '{"dependencies":{"vscode-langservers-extracted":"4.10.0"}}' > package.json \
+    && echo "{\"dependencies\":{\"vscode-langservers-extracted\":\"${JSON_LANGSERVER_VERSION}\"}}" > package.json \
     && npm install --no-fund --no-audit \
     && mkdir -p /opt/zed-data/languages/yaml-language-server \
     && cd /opt/zed-data/languages/yaml-language-server \
-    && echo '{"dependencies":{"yaml-language-server":"1.20.0"}}' > package.json \
+    && echo "{\"dependencies\":{\"yaml-language-server\":\"${YAML_LANGSERVER_VERSION}\"}}" > package.json \
     && npm install --no-fund --no-audit \
     && mkdir -p /opt/zed-data/prettier \
     && cd /opt/zed-data/prettier \
-    && echo '{"dependencies":{"prettier":"3.8.1"}}' > package.json \
+    && echo "{\"dependencies\":{\"prettier\":\"${PRETTIER_VERSION}\"}}" > package.json \
     && npm install --no-fund --no-audit
 
 # ── Builder: Python tools ──
 FROM python:3.12-slim AS python-tools
+ARG PYTHON_VERSION=3.12
 RUN pip install --prefix /opt/python-tools --no-cache-dir \
     mcp-server-git \
     mcp-server-fetch
@@ -45,6 +50,7 @@ RUN apt-get update \
 # ── Stage 2: Developer environment ──
 FROM system AS developer
 
+ARG PYTHON_VERSION=3.12
 ARG USERNAME=developer
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
@@ -66,7 +72,7 @@ COPY --from=node-tools /opt/zed-data /home/${USERNAME}/.local/share/zed
 RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.local
 COPY --from=python-tools /opt/python-tools /opt/python-tools
 ENV PATH="/opt/node-tools/bin:/opt/python-tools/bin:${PATH}" \
-    PYTHONPATH="/opt/python-tools/lib/python3.12/site-packages"
+    PYTHONPATH="/opt/python-tools/lib/python${PYTHON_VERSION}/site-packages"
 
 # Fix shebangs: pip entry-points from the build stage reference /usr/local/bin/python3.12
 # which doesn't exist in the runtime image. The devcontainer Python feature installs
