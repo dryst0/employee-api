@@ -209,12 +209,12 @@ class LoggingAspectTest {
         loggingAspect.logAround(joinPoint);
 
         // then
+        Predicate<LogEvent> executed = e ->
+            e.getLevel() == Level.INFO &&
+            e.getMessage().getFormattedMessage().contains("Executed");
+        appender.awaitEvent(executed, Duration.ofSeconds(2));
         appender.detach();
-        assertThat(appender.getEvents()).anyMatch(
-            e ->
-                e.getLevel() == Level.INFO &&
-                e.getMessage().getFormattedMessage().contains("Executed")
-        );
+        assertThat(appender.getEvents()).anyMatch(executed);
     }
 
     @Test
