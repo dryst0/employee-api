@@ -13,12 +13,13 @@
 	</parent>
 	<groupId>com.jfi</groupId>
 	<artifactId>employee</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<name>employee</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>25</java.version>
+		<revision>local</revision>
 		<disruptor.version>4.0.0</disruptor.version>
 		<springdoc.version>2.8.15</springdoc.version>
 		<archunit.version>1.4.1</archunit.version>
