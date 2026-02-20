@@ -6,7 +6,7 @@ Built through modern pair programming: an AI agent drives (writes the code) whil
 
 ## Tech Stack
 
-- Java 25, Spring Boot 3.5, Spring WebFlux, Spring Data R2DBC
+- Java 25, Spring Boot 3.5.11, Spring WebFlux, Spring Data R2DBC
 - PostgreSQL 17.8, Flyway migrations
 - Maven 3.9.12, Spring Boot Buildpacks (Paketo)
 - Log4j2, Micrometer Tracing, OpenTelemetry, Prometheus, Grafana, Tempo
@@ -53,11 +53,11 @@ See [Architecture diagram](docs/architecture.md) for the full component view and
 
 ## CI/CD
 
-GitHub Actions pipeline triggered on every push to `main`. Builds, tests, packages an OCI image, and pushes it to `ghcr.io/dryst0/employee-api`.
+GitHub Actions workflow with two jobs: **test** and **publish**. Triggered on push to `main` and pull requests, with path filtering so docs-only changes don't trigger builds. PRs only run tests; image publishing is push-to-main only.
 
-Each build is tagged with a traceable version: `<UTC timestamp>-<workflow run ID>-<short commit SHA>`. This version flows through the JAR manifest, image tag, and OCI metadata labels.
+Actions are pinned to commit SHAs for supply chain security. [Dependabot](.github/dependabot.yml) keeps Maven and GitHub Actions dependencies up to date weekly.
 
-See [CI pipeline diagram](docs/ci-pipeline.md) for the full workflow.
+See [CI pipeline diagram](docs/ci-pipeline.md) for the full workflow and version tagging details.
 
 ## Observability
 
