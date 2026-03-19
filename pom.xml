@@ -25,7 +25,21 @@
 		<archunit.version>1.4.1</archunit.version>
 		<google.bean-matcher.version>0.14</google.bean-matcher.version>
 		<lombok.version>1.18.42</lombok.version>
+		<!-- CVE overrides — remove once Spring Boot parent includes patched versions -->
+		<jackson-bom.version>2.21.1</jackson-bom.version>
+		<log4j2.version>2.25.3</log4j2.version>
+		<commons-lang3.version>3.18.0</commons-lang3.version>
+		<commons-compress.version>1.26.0</commons-compress.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-compress</artifactId>
+				<version>${commons-compress.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
