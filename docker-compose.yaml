@@ -39,5 +39,6 @@ services:
       - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
       - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
       - ./grafana-dashboard-golden-signals.json:/var/lib/grafana/dashboards/golden-signals.json:ro
+      - ./grafana-dashboard-k6-load-test.json:/var/lib/grafana/dashboards/k6-load-test.json:ro
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
