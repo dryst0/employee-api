@@ -61,9 +61,12 @@ docker compose run --rm k6-smoke
 
 # Load test (ramp-up to 50 VUs, ~2 min — exports metrics to Grafana)
 docker compose run --rm k6-load
+
+# Load test with a custom run ID (for comparing runs side-by-side in Grafana)
+K6_RUN_ID=after-connection-pool-tuning docker compose run --rm k6-load
 ```
 
-Results are visible in the **k6 Load Test Results** Grafana dashboard at http://localhost:3000 during and after the run.
+Results are visible in the **k6 Load Test Results** Grafana dashboard at http://localhost:3000 during and after the run. Each run is identified by a run ID (defaults to an ISO 8601 timestamp). Use the **run** dropdown in the dashboard to filter or compare runs side-by-side.
 
 ## CI/CD
 

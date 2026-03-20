@@ -36,6 +36,9 @@ docker compose run --rm k6-smoke
 
 # Run load test (ramp-up to 50 VUs, ~2 min, exports metrics to Grafana)
 docker compose run --rm k6-load
+
+# Run load test with a custom run ID (for comparing runs in Grafana)
+K6_RUN_ID=after-connection-pool-tuning docker compose run --rm k6-load
 ```
 
 ## Architecture
