@@ -51,6 +51,20 @@ See [Architecture diagram](docs/architecture.md) for the full component view and
 ./mvnw spring-boot:build-image
 ```
 
+## Load Testing
+
+k6 load tests run via Docker Compose, exercising the full CRUD lifecycle (create → read → list → update → patch → delete) per virtual user.
+
+```bash
+# Smoke test (1 VU, 1 iteration — quick validation)
+docker compose run --rm k6-smoke
+
+# Load test (ramp-up to 50 VUs, ~2 min — exports metrics to Grafana)
+docker compose run --rm k6-load
+```
+
+Results are visible in the **k6 Load Test Results** Grafana dashboard at http://localhost:3000 during and after the run.
+
 ## CI/CD
 
 GitHub Actions workflow with two jobs: **test** and **publish**. Triggered on push to `main` and pull requests, with path filtering so docs-only changes don't trigger builds. PRs only run tests; image publishing is push-to-main only.
