@@ -30,6 +30,12 @@ Employee API — a RESTful CRUD API built with Java 25, Spring Boot 3.5, Spring 
 
 # Run container
 docker run -p 8080:8080 ghcr.io/dryst0/employee-api:0.0.1-SNAPSHOT
+
+# Run load test smoke (single user, validates script runs correctly)
+docker run --rm --network=host -v $(pwd)/load-test:/load-test grafana/k6 run /load-test/smoke.js
+
+# Run load test (ramp-up to 50 VUs, ~2 min)
+docker run --rm --network=host -v $(pwd)/load-test:/load-test grafana/k6 run /load-test/load.js
 ```
 
 ## Architecture
