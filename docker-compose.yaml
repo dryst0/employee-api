@@ -36,9 +36,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
-      - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
-      - ./grafana-dashboard-golden-signals.json:/var/lib/grafana/dashboards/golden-signals.json:ro
-      - ./grafana-dashboard-k6-load-test.json:/var/lib/grafana/dashboards/k6-load-test.json:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
