@@ -1,6 +1,7 @@
 import http from "k6/http";
 
 const BASE_URL = __ENV.BASE_URL || "http://localhost:8080";
+const EMPLOYEES_URL = `${BASE_URL}/employees`;
 
 export default function () {
   const payload = JSON.stringify({
@@ -10,15 +11,14 @@ export default function () {
   });
 
   const headers = { "Content-Type": "application/json" };
+  const byIdTag = { tags: { name: "GET /employees/{uuid}" } };
 
-  const createResponse = http.post(`${BASE_URL}/employees`, payload, {
-    headers,
-  });
+  const createResponse = http.post(EMPLOYEES_URL, payload, { headers });
   const employeeUuid = createResponse.json("uuid");
 
-  http.get(`${BASE_URL}/employees/${employeeUuid}`);
+  http.get(`${EMPLOYEES_URL}/${employeeUuid}`, byIdTag);
 
-  http.get(`${BASE_URL}/employees`);
+  http.get(EMPLOYEES_URL);
 
   const updatePayload = JSON.stringify({
     firstName: `Updated-${__VU}-${__ITER}`,
@@ -26,17 +26,21 @@ export default function () {
     employeeType: "MANAGER",
   });
 
-  http.put(`${BASE_URL}/employees/${employeeUuid}`, updatePayload, {
+  http.put(`${EMPLOYEES_URL}/${employeeUuid}`, updatePayload, {
     headers,
+    tags: { name: "PUT /employees/{uuid}" },
   });
 
   const patchPayload = JSON.stringify({
     firstName: `Patched-${__VU}-${__ITER}`,
   });
 
-  http.patch(`${BASE_URL}/employees/${employeeUuid}`, patchPayload, {
+  http.patch(`${EMPLOYEES_URL}/${employeeUuid}`, patchPayload, {
     headers,
+    tags: { name: "PATCH /employees/{uuid}" },
   });
 
-  http.del(`${BASE_URL}/employees/${employeeUuid}`);
+  http.del(`${EMPLOYEES_URL}/${employeeUuid}`, null, {
+    tags: { name: "DELETE /employees/{uuid}" },
+  });
 }
