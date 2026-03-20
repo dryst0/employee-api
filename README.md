@@ -132,3 +132,7 @@ The AOT cache step exits with code 1 despite success. Disabled via `BP_JVM_CDS_E
 ### Flyway does not support PostgreSQL 18
 
 Flyway 11.7.2 (managed by Spring Boot 3.5) warns that PostgreSQL 18 is untested. Pinned to PostgreSQL 17.8 — keep docker-compose and Testcontainers config in sync since they are coupled.
+
+### CLAUDE.md over MCP memory server for project context
+
+We initially used an MCP memory server (knowledge graph) to persist project context across sessions. The pragmatic choice turned out to be `CLAUDE.md` — it's version-controlled, readable by any contributor, requires no external service, and is natively supported by Claude Code. The memory server added complexity without enough benefit over a plain file checked into the repo.
