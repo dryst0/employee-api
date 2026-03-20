@@ -13,6 +13,8 @@ services:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
@@ -32,5 +34,7 @@ services:
       - "3000:3000"
     volumes:
       - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./grafana-dashboard-golden-signals.json:/var/lib/grafana/dashboards/golden-signals.json:ro
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
