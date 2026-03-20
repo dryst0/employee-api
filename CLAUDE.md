@@ -32,18 +32,10 @@ Employee API — a RESTful CRUD API built with Java 25, Spring Boot 3.5, Spring 
 docker run -p 8080:8080 ghcr.io/dryst0/employee-api:0.0.1-SNAPSHOT
 
 # Run load test smoke (single user, validates script runs correctly)
-docker run --rm --network=host -v $(pwd)/load-test:/load-test grafana/k6 run /load-test/smoke.js
+docker compose run --rm k6-smoke
 
-# Run load test (ramp-up to 50 VUs, ~2 min)
-docker run --rm --network=host -v $(pwd)/load-test:/load-test grafana/k6 run /load-test/load.js
-
-# Run load test with metrics exported to Prometheus (visible in Grafana)
-docker run --rm --network=host -v $(pwd)/load-test:/load-test \
-  -e K6_OTEL_EXPORTER_PROTOCOL=http/protobuf \
-  -e K6_OTEL_HTTP_EXPORTER_ENDPOINT=localhost:9090 \
-  -e K6_OTEL_HTTP_EXPORTER_URL_PATH=/api/v1/otlp/v1/metrics \
-  -e K6_OTEL_HTTP_EXPORTER_INSECURE=true \
-  grafana/k6 run --out opentelemetry /load-test/load.js
+# Run load test (ramp-up to 50 VUs, ~2 min, exports metrics to Grafana)
+docker compose run --rm k6-load
 ```
 
 ## Architecture

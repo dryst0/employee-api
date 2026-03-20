@@ -40,3 +40,24 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
+
+  k6-smoke:
+    image: grafana/k6:latest
+    network_mode: host
+    volumes:
+      - ./load-test:/load-test:ro
+    command: ["run", "/load-test/smoke.js"]
+    profiles: ["load-test"]
+
+  k6-load:
+    image: grafana/k6:latest
+    network_mode: host
+    volumes:
+      - ./load-test:/load-test:ro
+    environment:
+      K6_OTEL_EXPORTER_PROTOCOL: http/protobuf
+      K6_OTEL_HTTP_EXPORTER_ENDPOINT: localhost:9090
+      K6_OTEL_HTTP_EXPORTER_URL_PATH: /api/v1/otlp/v1/metrics
+      K6_OTEL_HTTP_EXPORTER_INSECURE: "true"
+    command: ["run", "--out", "opentelemetry", "/load-test/load.js"]
+    profiles: ["load-test"]
