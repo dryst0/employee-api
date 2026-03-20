@@ -2,7 +2,7 @@
   "name": "Employee API",
   "image": "ghcr.io/dryst0/devcontainer:latest",
 
-  "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
+  "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW", "-p", "127.0.0.1:3000:3000"],
 
   "features": {
     "ghcr.io/devcontainers/features/java:1": { "version": "25" },
@@ -17,8 +17,6 @@
     "source=shared-docker-cache,target=/var/lib/docker,type=volume",
     "source=employee-api-history,target=/commandhistory,type=volume"
   ],
-
-  "forwardPorts": [8080, 3000, 5432],
 
   "containerEnv": {
     "TESTCONTAINERS_RYUK_DISABLED": "true",
