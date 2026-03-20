@@ -16,5 +16,9 @@ export default function () {
   });
   const employeeUuid = createResponse.json("uuid");
 
+  http.get(`${BASE_URL}/employees/${employeeUuid}`);
+
+  http.get(`${BASE_URL}/employees`);
+
   http.del(`${BASE_URL}/employees/${employeeUuid}`);
 }
