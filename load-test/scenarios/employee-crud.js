@@ -20,5 +20,23 @@ export default function () {
 
   http.get(`${BASE_URL}/employees`);
 
+  const updatePayload = JSON.stringify({
+    firstName: `Updated-${__VU}-${__ITER}`,
+    lastName: `Employee-${__VU}-${__ITER}`,
+    employeeType: "MANAGER",
+  });
+
+  http.put(`${BASE_URL}/employees/${employeeUuid}`, updatePayload, {
+    headers,
+  });
+
+  const patchPayload = JSON.stringify({
+    firstName: `Patched-${__VU}-${__ITER}`,
+  });
+
+  http.patch(`${BASE_URL}/employees/${employeeUuid}`, patchPayload, {
+    headers,
+  });
+
   http.del(`${BASE_URL}/employees/${employeeUuid}`);
 }
