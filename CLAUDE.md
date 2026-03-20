@@ -36,6 +36,14 @@ docker run --rm --network=host -v $(pwd)/load-test:/load-test grafana/k6 run /lo
 
 # Run load test (ramp-up to 50 VUs, ~2 min)
 docker run --rm --network=host -v $(pwd)/load-test:/load-test grafana/k6 run /load-test/load.js
+
+# Run load test with metrics exported to Prometheus (visible in Grafana)
+docker run --rm --network=host -v $(pwd)/load-test:/load-test \
+  -e K6_OTEL_EXPORTER_PROTOCOL=http/protobuf \
+  -e K6_OTEL_HTTP_EXPORTER_ENDPOINT=localhost:9090 \
+  -e K6_OTEL_HTTP_EXPORTER_URL_PATH=/api/v1/otlp/v1/metrics \
+  -e K6_OTEL_HTTP_EXPORTER_INSECURE=true \
+  grafana/k6 run --out opentelemetry /load-test/load.js
 ```
 
 ## Architecture

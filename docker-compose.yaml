@@ -17,6 +17,9 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-otlp-receiver"
 
   tempo:
     image: grafana/tempo:2.6.1
