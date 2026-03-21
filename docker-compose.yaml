@@ -32,6 +32,11 @@ services:
       - ./tempo.yaml:/etc/tempo.yaml:ro
     command: ["-config.file=/etc/tempo.yaml"]
 
+  pyroscope:
+    image: grafana/pyroscope:latest
+    ports:
+      - "4040:4040"
+
   grafana:
     image: grafana/grafana:latest
     ports:

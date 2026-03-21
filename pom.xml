@@ -25,6 +25,7 @@
 		<archunit.version>1.4.1</archunit.version>
 		<google.bean-matcher.version>0.14</google.bean-matcher.version>
 		<lombok.version>1.18.42</lombok.version>
+		<pyroscope.version>2.5.1</pyroscope.version>
 		<!-- CVE overrides — remove once Spring Boot parent includes patched versions -->
 		<jackson-bom.version>2.21.1</jackson-bom.version>
 		<log4j2.version>2.25.3</log4j2.version>
@@ -126,6 +127,14 @@
 			<groupId>com.lmax</groupId>
 			<artifactId>disruptor</artifactId>
 			<version>${disruptor.version}</version>
+		</dependency>
+
+		<!-- Continuous Profiling -->
+		<dependency>
+			<groupId>io.pyroscope</groupId>
+			<artifactId>agent</artifactId>
+			<version>${pyroscope.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Developer Tools -->
@@ -235,6 +244,15 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<agents>
+						<agent>${settings.localRepository}/io/pyroscope/agent/${pyroscope.version}/agent-${pyroscope.version}.jar</agent>
+					</agents>
+					<jvmArguments>
+						-DPYROSCOPE_APPLICATION_NAME=employee-api
+						-DPYROSCOPE_SERVER_ADDRESS=http://localhost:4040
+						-DPYROSCOPE_PROFILER_ALLOC=512k
+						-DPYROSCOPE_PROFILER_LOCK=10ms
+					</jvmArguments>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

@@ -83,3 +83,4 @@ Dependencies point inward: adapters → ports/use cases → domain. Inbound adap
 - **Logging**: Log4j2 + MDC (`requestId`, `traceId`, `spanId`). `RequestIdFilter` (ID lifecycle) + `RequestLoggingFilter` (HTTP logging) + `LoggingAspect` (composable named pointcuts)
 - **Metrics**: Prometheus + Grafana. Micrometer registry exposed via Actuator `/metrics`
 - **Tracing**: Micrometer Tracing + OTel bridge → Grafana Tempo (OTLP port 4318). `@Observed` on service + persistence layers. Trace hierarchy: HTTP → `employee.service` → `employee.persistence`
+- **Profiling**: Pyroscope javaagent (push mode, always-on) → Grafana Pyroscope. Server address via `PYROSCOPE_SERVER_ADDRESS` env var. UI at `localhost:4040`

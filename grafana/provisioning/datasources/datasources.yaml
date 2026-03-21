@@ -24,3 +24,16 @@ datasources:
         enabled: true
       serviceMap:
         datasourceUid: prometheus
+      tracesToProfilesV2:
+        datasourceUid: pyroscope
+        tags:
+          - key: service.name
+            value: ''
+
+  - name: Pyroscope
+    uid: pyroscope
+    type: grafana-pyroscope-datasource
+    access: proxy
+    url: http://pyroscope:4040
+    isDefault: false
+    editable: false
