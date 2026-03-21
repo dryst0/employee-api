@@ -143,22 +143,13 @@ class ActuatorEndpointsIT {
 
     @Test
     void givenApplicationIsRunning_whenTracingIsChecked_thenAnnotationDrivenSpansAreEnabled() {
-        try {
-            Class<?> observedAspectClass = Class.forName(
-                "io.micrometer.observation.aop.ObservedAspect"
-            );
-            String[] observedAspectBeans =
-                applicationContext.getBeanNamesForType(observedAspectClass);
-            assertTrue(
-                observedAspectBeans.length > 0,
-                "Expected an ObservedAspect bean for annotation-driven span creation"
-            );
-        } catch (ClassNotFoundException e) {
-            throw new AssertionError(
-                "Expected io.micrometer.observation.aop.ObservedAspect on classpath",
-                e
-            );
-        }
+        String[] aspectBeans = applicationContext.getBeanNamesForType(
+            ReactiveObservationAspect.class
+        );
+        assertTrue(
+            aspectBeans.length > 0,
+            "Expected a ReactiveObservationAspect bean for annotation-driven span creation"
+        );
     }
 
     @Test
