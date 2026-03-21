@@ -20,5 +20,7 @@ datasources:
     editable: false
     jsonData:
       httpMethod: GET
+      nodeGraph:
+        enabled: true
       serviceMap:
         datasourceUid: prometheus

@@ -20,6 +20,7 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.enable-otlp-receiver"
+      - "--web.enable-remote-write-receiver"
 
   tempo:
     image: grafana/tempo:2.6.1
