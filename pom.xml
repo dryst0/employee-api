@@ -105,6 +105,11 @@
 			<artifactId>opentelemetry-exporter-otlp</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>io.r2dbc</groupId>
+			<artifactId>r2dbc-proxy</artifactId>
+		</dependency>
+
 		<!-- OpenAPIv3-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
