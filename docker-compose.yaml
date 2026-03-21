@@ -41,6 +41,7 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
+      ALERT_WEBHOOK_URL: "http://localhost:9999/noop"
 
   k6-smoke:
     image: grafana/k6:latest

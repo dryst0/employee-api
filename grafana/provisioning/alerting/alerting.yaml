@@ -1,0 +1,548 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: alerts
+    receivers:
+      - uid: alerts-webhook
+        type: webhook
+        disableResolveMessage: false
+        settings:
+          url: $ALERT_WEBHOOK_URL
+          httpMethod: POST
+
+policies:
+  - orgId: 1
+    receiver: alerts
+    group_by:
+      - grafana_folder
+      - alertname
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 4h
+
+groups:
+  - orgId: 1
+    name: golden-signals-latency
+    folder: Employee API Alerts
+    interval: 1m
+    rules:
+      - uid: high-latency-p95-critical
+        title: "High Request Latency P95 (Critical)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{uri!~"/actuator.*"}[2m])) by (le))'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 1.0
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 2m
+        labels:
+          severity: critical
+          signal: latency
+        annotations:
+          summary: "P95 request latency exceeds 1.0s"
+          description: "The 95th percentile request latency has been above 1.0 second for more than 2 minutes."
+
+      - uid: high-latency-p95-warning
+        title: "High Request Latency P95 (Warning)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{uri!~"/actuator.*"}[2m])) by (le))'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 0.5
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 5m
+        labels:
+          severity: warning
+          signal: latency
+        annotations:
+          summary: "P95 request latency exceeds 0.5s"
+          description: "The 95th percentile request latency has been above 0.5 seconds for more than 5 minutes."
+
+  - orgId: 1
+    name: golden-signals-errors
+    folder: Employee API Alerts
+    interval: 1m
+    rules:
+      - uid: high-error-rate-critical
+        title: "High Error Rate (Critical)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: '(sum(rate(http_server_requests_seconds_count{status=~"5.."}[2m])) or vector(0)) / sum(rate(http_server_requests_seconds_count[2m])) * 100'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 5
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 2m
+        labels:
+          severity: critical
+          signal: errors
+        annotations:
+          summary: "5xx error rate exceeds 5%"
+          description: "Server error rate has been above 5% for more than 2 minutes."
+
+      - uid: high-error-rate-warning
+        title: "High Error Rate (Warning)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: '(sum(rate(http_server_requests_seconds_count{status=~"5.."}[2m])) or vector(0)) / sum(rate(http_server_requests_seconds_count[2m])) * 100'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 1
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 5m
+        labels:
+          severity: warning
+          signal: errors
+        annotations:
+          summary: "5xx error rate exceeds 1%"
+          description: "Server error rate has been above 1% for more than 5 minutes."
+
+  - orgId: 1
+    name: golden-signals-saturation
+    folder: Employee API Alerts
+    interval: 1m
+    rules:
+      - uid: r2dbc-pool-saturation-critical
+        title: "R2DBC Connection Pool Saturation (Critical)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'r2dbc_pool_acquired_connections / r2dbc_pool_max_allocated_connections * 100'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 90
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 2m
+        labels:
+          severity: critical
+          signal: saturation
+        annotations:
+          summary: "R2DBC connection pool utilization exceeds 90%"
+          description: "Database connection pool has been above 90% utilization for more than 2 minutes."
+
+      - uid: r2dbc-pool-saturation-warning
+        title: "R2DBC Connection Pool Saturation (Warning)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'r2dbc_pool_acquired_connections / r2dbc_pool_max_allocated_connections * 100'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 70
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 5m
+        labels:
+          severity: warning
+          signal: saturation
+        annotations:
+          summary: "R2DBC connection pool utilization exceeds 70%"
+          description: "Database connection pool has been above 70% utilization for more than 5 minutes."
+
+      - uid: r2dbc-pending-connections
+        title: "R2DBC Pending Connections"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'r2dbc_pool_pending_connections'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 0
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 2m
+        labels:
+          severity: warning
+          signal: saturation
+        annotations:
+          summary: "R2DBC pool has pending connection requests"
+          description: "Requests are waiting for database connections for more than 2 minutes."
+
+      - uid: jvm-heap-memory-critical
+        title: "JVM Heap Memory High (Critical)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} * 100'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 95
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 2m
+        labels:
+          severity: critical
+          signal: saturation
+        annotations:
+          summary: "JVM heap memory exceeds 95%"
+          description: "JVM heap memory utilization has been above 95% for more than 2 minutes."
+
+      - uid: jvm-heap-memory-warning
+        title: "JVM Heap Memory High (Warning)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} * 100'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 80
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 5m
+        labels:
+          severity: warning
+          signal: saturation
+        annotations:
+          summary: "JVM heap memory exceeds 80%"
+          description: "JVM heap memory utilization has been above 80% for more than 5 minutes."
+
+      - uid: high-cpu-usage-warning
+        title: "High CPU Usage (Warning)"
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'process_cpu_usage * 100'
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              refId: B
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              refId: C
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params:
+                      - 90
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+        for: 5m
+        labels:
+          severity: warning
+          signal: saturation
+        annotations:
+          summary: "Process CPU usage exceeds 90%"
+          description: "JVM process CPU usage has been above 90% for more than 5 minutes."
