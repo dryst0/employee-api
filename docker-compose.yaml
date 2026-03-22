@@ -1,4 +1,25 @@
 services:
+  app:
+    image: ghcr.io/dryst0/employee-api:local
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/employee
+      SPRING_R2DBC_USERNAME: employee
+      SPRING_R2DBC_PASSWORD: employee
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/employee
+      SPRING_DATASOURCE_USERNAME: employee
+      SPRING_DATASOURCE_PASSWORD: employee
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://tempo:4318/v1/traces
+      PYROSCOPE_SERVER_ADDRESS: http://pyroscope:4040
+    depends_on:
+      - postgres
+      - tempo
+      - pyroscope
+    profiles: ["containerized"]
+
   postgres:
     # Flyway 11.7.2 (managed by Spring Boot) does not officially support PostgreSQL 18
     image: postgres:17.8
@@ -10,7 +31,7 @@ services:
       POSTGRES_PASSWORD: employee
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.10.0
     ports:
       - "9090:9090"
     extra_hosts:
@@ -33,12 +54,29 @@ services:
     command: ["-config.file=/etc/tempo.yaml"]
 
   pyroscope:
-    image: grafana/pyroscope:latest
+    image: grafana/pyroscope:1.19.0
     ports:
       - "4040:4040"
 
+  loki:
+    image: grafana/loki:3.4.3
+    ports:
+      - "3100:3100"
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+
+  alloy:
+    image: grafana/alloy:v1.14.1
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./alloy-config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: ["run", "--server.http.listen-addr=0.0.0.0:12345", "/etc/alloy/config.alloy"]
+    depends_on:
+      - loki
+
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:12.4.1
     ports:
       - "3000:3000"
     volumes:
@@ -49,7 +87,7 @@ services:
       ALERT_WEBHOOK_URL: "http://localhost:9999/noop"
 
   k6-smoke:
-    image: grafana/k6:latest
+    image: grafana/k6:1.6.1
     network_mode: host
     volumes:
       - ./load-test:/load-test:ro
@@ -57,7 +95,7 @@ services:
     profiles: ["load-test"]
 
   k6-load:
-    image: grafana/k6:latest
+    image: grafana/k6:1.6.1
     network_mode: host
     volumes:
       - ./load-test:/load-test:ro
