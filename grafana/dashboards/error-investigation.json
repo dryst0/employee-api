@@ -1,0 +1,283 @@
+{
+  "uid": "employee-api-error-investigation",
+  "title": "Employee API - Error Investigation",
+  "description": "Deep-dive error investigation: metrics, logs, and traces",
+  "tags": ["errors", "employee-api"],
+  "timezone": "browser",
+  "refresh": "15s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "editable": true,
+  "panels": [
+    {
+      "type": "row",
+      "title": "Error Overview",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Rate (4xx vs 5xx)",
+      "gridPos": { "h": 8, "w": 10, "x": 0, "y": 1 },
+      "id": 2,
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "4xx" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "5xx" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"4..\", uri!~\"/actuator.*\"}[$__rate_interval]))",
+          "legendFormat": "4xx",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\", uri!~\"/actuator.*\"}[$__rate_interval]))",
+          "legendFormat": "5xx",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Top Error Endpoints",
+      "gridPos": { "h": 8, "w": 8, "x": 10, "y": 1 },
+      "id": 3,
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "Error Count", "desc": true }]
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true },
+            "renameByName": {
+              "method": "Method",
+              "uri": "Endpoint",
+              "status": "Status",
+              "Value": "Error Count"
+            },
+            "indexByName": {
+              "method": 0,
+              "uri": 1,
+              "status": 2,
+              "Value": 3
+            }
+          }
+        }
+      ],
+      "targets": [
+        {
+          "expr": "sort_desc(sum by (method, uri, status) (increase(http_server_requests_seconds_count{status=~\"[45]..\", uri!~\"/actuator.*\"}[$__range])))",
+          "legendFormat": "{{method}} {{uri}} {{status}}",
+          "refId": "A",
+          "format": "table",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Error Count by Status Code",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 1 },
+      "id": 4,
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (status) (increase(http_server_requests_seconds_count{status=~\"[45]..\", uri!~\"/actuator.*\"}[$__range]))",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Error Logs",
+      "collapsed": true,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "id": 5,
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Log Volume by Level",
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 10 },
+          "id": 6,
+          "datasource": { "type": "loki", "uid": "loki" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 50,
+                "stacking": { "mode": "normal" }
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "ERROR" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "WARN" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "INFO" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "expr": "sum by (level) (count_over_time({container=~\".*app.*\"} | level=~\"ERROR|WARN|INFO\" [$__auto]))",
+              "legendFormat": "{{level}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "type": "logs",
+          "title": "Error and Warn Log Stream",
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 16 },
+          "id": 7,
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "prettifyLogMessage": false,
+            "enableLogDetails": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none"
+          },
+          "targets": [
+            {
+              "expr": "{container=~\".*app.*\", level=~\"ERROR|WARN\"} | pattern \"<timestamp> <level> [<thread>] [requestId=<requestId>] [traceId=<traceId>] [spanId=<spanId>] <logger> - <message>\" | line_format \"{{.level}} [requestId={{.requestId}}] [traceId={{.traceId}}] {{.logger}} - {{.message}}\"",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Error Traces",
+      "collapsed": true,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 10 },
+      "id": 8,
+      "panels": [
+        {
+          "type": "table",
+          "title": "Recent Error Traces",
+          "gridPos": { "h": 10, "w": 16, "x": 0, "y": 11 },
+          "id": 9,
+          "datasource": { "type": "tempo", "uid": "tempo" },
+          "options": {
+            "showHeader": true,
+            "sortBy": [{ "displayName": "Start time", "desc": true }]
+          },
+          "targets": [
+            {
+              "queryType": "traceql",
+              "query": "{status = error || span.http.response.status_code >= 400}",
+              "tableType": "traces",
+              "limit": 20,
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Error vs Success Latency (p95)",
+          "gridPos": { "h": 10, "w": 8, "x": 16, "y": 11 },
+          "id": 10,
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "fillOpacity": 10
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "p95 errors" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "p95 success" },
+                "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{status=~\"[45]..\", uri!~\"/actuator.*\"}[$__rate_interval])) by (le))",
+              "legendFormat": "p95 errors",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{status=~\"[23]..\", uri!~\"/actuator.*\"}[$__rate_interval])) by (le))",
+              "legendFormat": "p95 success",
+              "refId": "B"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

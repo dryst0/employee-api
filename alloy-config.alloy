@@ -21,7 +21,7 @@ loki.source.docker "default" {
 
 loki.process "pipeline" {
   stage.regex {
-    expression = "^\\S+ (?P<level>\\S+)"
+    expression = "^\\S+ (?P<level>DEBUG|INFO|WARN|ERROR|FATAL)\\s"
   }
 
   stage.labels {
