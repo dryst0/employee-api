@@ -29,6 +29,12 @@ datasources:
         tags:
           - key: service.name
             value: ''
+      tracesToLogsV2:
+        datasourceUid: loki
+        spanStartTimeShift: "-1h"
+        spanEndTimeShift: "1h"
+        filterByTraceID: true
+        filterBySpanID: false
 
   - name: Pyroscope
     uid: pyroscope
@@ -37,3 +43,17 @@ datasources:
     url: http://pyroscope:4040
     isDefault: false
     editable: false
+
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    isDefault: false
+    editable: false
+    jsonData:
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: "traceId=(\\w+)"
+          name: TraceID
+          url: "$${__value.raw}"

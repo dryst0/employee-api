@@ -14,6 +14,8 @@ flowchart TD
     subgraph Logging
         LOG4J2[Log4j2 + Disruptor<br/>Async, structured output]
         MDC[MDC Context<br/>requestId, traceId, spanId]
+        ALLOY[Grafana Alloy<br/>Docker log scraping]
+        LOKI[Grafana Loki<br/>Log aggregation]
     end
 
     subgraph Metrics
@@ -36,6 +38,8 @@ flowchart TD
     LOG_FILTER --> LOG4J2
     LOG_ASPECT --> LOG4J2
     MDC --> LOG4J2
+    LOG4J2 --> ALLOY
+    ALLOY --> LOKI
 
     OBSERVED --> MICROMETER
     MICROMETER --> ACTUATOR
@@ -47,6 +51,7 @@ flowchart TD
 
     PROMETHEUS --> GRAFANA
     TEMPO --> GRAFANA
+    LOKI --> GRAFANA
 
     style Application fill:#e3f2fd,stroke:#1565c0
     style Logging fill:#fff3e0,stroke:#e65100
@@ -80,3 +85,18 @@ flowchart TD
 ```
 
 Context propagation through reactive chains is handled by `spring.reactor.context-propagation=auto` and `Mono.deferContextual()` in the `LoggingAspect`.
+
+## Centralized Logging
+
+Logs are aggregated via **Grafana Loki**, collected by **Grafana Alloy**.
+
+| Component | Role |
+|-----------|------|
+| Log4j2 Console appender | App writes structured logs to stdout |
+| Docker | Captures container stdout as JSON log files |
+| Grafana Alloy | Scrapes Docker container logs, extracts `level` label, pushes to Loki |
+| Grafana Loki | Stores and indexes logs, queryable via Grafana Explore |
+
+**Correlation:** Grafana links logs and traces bidirectionally — Loki `derivedFields` extracts `traceId` from log lines to link to Tempo, and Tempo `tracesToLogsV2` filters Loki by trace ID.
+
+**Local dev note:** When running via `./mvnw spring-boot:run` (host, not containerized), logs appear in the terminal only. Loki integration requires the app to run as a Docker container (`docker compose up`).
