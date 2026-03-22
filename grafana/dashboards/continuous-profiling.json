@@ -1,0 +1,187 @@
+{
+  "uid": "employee-api-continuous-profiling",
+  "title": "Employee API - Continuous Profiling",
+  "description": "CPU, memory allocation, and lock contention profiles via Pyroscope",
+  "tags": ["profiling", "employee-api"],
+  "timezone": "browser",
+  "refresh": "15s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "editable": true,
+  "panels": [
+    {
+      "type": "row",
+      "title": "CPU",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Profile Over Time",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+      "id": 2,
+      "datasource": { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ns",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "queryType": "metrics",
+          "profileTypeId": "process_cpu:cpu:nanoseconds:cpu:nanoseconds",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "flamegraph",
+      "title": "CPU Flame Graph",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "id": 3,
+      "datasource": { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "targets": [
+        {
+          "queryType": "profile",
+          "profileTypeId": "process_cpu:cpu:nanoseconds:cpu:nanoseconds",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Memory / Allocation",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "id": 4
+    },
+    {
+      "type": "timeseries",
+      "title": "Allocation Profile Over Time",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "id": 5,
+      "datasource": { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "queryType": "metrics",
+          "profileTypeId": "memory:alloc_in_new_tlab_bytes:bytes:space:bytes",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "legendFormat": "alloc bytes",
+          "refId": "A"
+        },
+        {
+          "queryType": "metrics",
+          "profileTypeId": "memory:alloc_in_new_tlab_objects:count:space:bytes",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "legendFormat": "alloc count",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "flamegraph",
+      "title": "Allocation Flame Graph (Bytes)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "id": 6,
+      "datasource": { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "targets": [
+        {
+          "queryType": "profile",
+          "profileTypeId": "memory:alloc_in_new_tlab_bytes:bytes:space:bytes",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Lock Contention",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+      "id": 7
+    },
+    {
+      "type": "timeseries",
+      "title": "Lock Contention Profile Over Time",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 },
+      "id": 8,
+      "datasource": { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "queryType": "metrics",
+          "profileTypeId": "block:delay:nanoseconds:block:count",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "legendFormat": "block duration",
+          "refId": "A"
+        },
+        {
+          "queryType": "metrics",
+          "profileTypeId": "block:contentions:count:block:count",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "legendFormat": "block count",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "flamegraph",
+      "title": "Lock Contention Flame Graph (Duration)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 },
+      "id": 9,
+      "datasource": { "type": "grafana-pyroscope-datasource", "uid": "pyroscope" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "targets": [
+        {
+          "queryType": "profile",
+          "profileTypeId": "block:delay:nanoseconds:block:count",
+          "labelSelector": "{service_name=\"employee-api\"}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

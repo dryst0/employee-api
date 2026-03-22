@@ -134,7 +134,6 @@
 			<groupId>io.pyroscope</groupId>
 			<artifactId>agent</artifactId>
 			<version>${pyroscope.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<!-- Developer Tools -->
@@ -244,15 +243,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<agents>
-						<agent>${settings.localRepository}/io/pyroscope/agent/${pyroscope.version}/agent-${pyroscope.version}.jar</agent>
-					</agents>
-					<jvmArguments>
-						-DPYROSCOPE_APPLICATION_NAME=employee-api
-						-DPYROSCOPE_SERVER_ADDRESS=http://localhost:4040
-						-DPYROSCOPE_PROFILER_ALLOC=512k
-						-DPYROSCOPE_PROFILER_LOCK=10ms
-					</jvmArguments>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
